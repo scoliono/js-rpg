@@ -12,6 +12,11 @@ const randomInt = (min, max) => {
 };
 
 /**
+ * Returns a random element of an Array.
+ */
+const randomChoice = arr => arr[randomInt(0, arr.length - 1)];
+
+/**
  * Returns the name of a random item in the game.
  * @returns String
  */
@@ -78,10 +83,15 @@ const removeItems = (inventory, itemList) => {
  * Gets a random enemy.
  * @returns Object
  */
-const randomEnemy = () => {
-    let enemyNames = Object.keys(allAnimals).filter(a => !a.friendly);
-    let randEnemyName = enemyNames[randomInt(0, enemyNames.length - 1)];
-    return allAnimals[randEnemyName];
+const randomEnemy = () => randomChoice(allAnimals.filter(a => !a.friendly));
+
+/**
+ * A list of all status codes that a command can return.
+ */
+const Status = {
+    FAILURE: 0,
+    SUCCESS: 1,
+    MOVED: 2
 };
 
 module.exports = {
@@ -90,5 +100,7 @@ module.exports = {
     countItem,
     findItem,
     removeItems,
-    randomEnemy
+    randomEnemy,
+    randomChoice,
+    Status
 };

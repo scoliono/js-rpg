@@ -1,5 +1,5 @@
 Combat (wip)
-Don't do enemy encounters when doing a non-moving command
+randomInt not returning max (bug)
 Invisibility cloak (wip)
 Backpack item (wip- crafting recipe)
 Shield

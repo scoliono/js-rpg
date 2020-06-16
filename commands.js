@@ -8,7 +8,7 @@ module.exports = {
         let itemName = args[1];
         if (!itemName) {
             console.error('You did not specify an item to craft.');
-            return false;
+            return helpers.Status.FAILURE;
         }
         let item = allItems[itemName];
         // only allow already discovered items with ingredients list to be crafted 
@@ -17,18 +17,18 @@ module.exports = {
             if (success) {
                 player.inventory.push({ name: itemName });
                 console.log(`You crafted a ${itemName}!`);
-                return true;
+                return helpers.status.SUCCESS;
             } else {
                 console.log(`To craft a ${itemName} you need:`);
                 for (let ingredient in item.ingredients) {
                     let requiredCount = item.ingredients[ingredient];
                     console.log(`- ${requiredCount}x ${ingredient}`);
                 }
-                return false;
+                return helpers.Status.FAILURE;
             }
         } else {
             console.log('You\'ve never heard of that before.');
-            return false;
+            return helpers.Status.FAILURE;
         }
     },
     eat: function (player, args) {
@@ -37,28 +37,35 @@ module.exports = {
             if (success) {
                 player.hunger += helpers.randomInt(...allItems.Rations.hunger);
                 player.hunger = Math.min(player.hunger, 100);
+                return helpers.Status.SUCCESS;
             } else {
                 console.error('You have nothing to eat.');
+                return helpers.Status.FAILURE;
             }
         } else {
             console.error('You are not hungry.');
+            return helpers.Status.FAILURE;
         }
     },
     walk: function (player, args) {
         const place = args[1] || 'middle of nowhere';
         console.log(`You walk to the ${place}.`);
         player.hunger -= helpers.randomInt(1, 5);
+        player.justMoved = true;
+        return helpers.Status.SUCCESS | helpers.Status.MOVED;
     },
     run: function (player, args) {
         const place = args[1] || 'middle of nowhere';
         console.log(`You run to the ${place}.`);
         player.hunger -= helpers.randomInt(3, 10);
+        player.justMoved = true;
+        return helpers.Status.SUCCESS | helpers.Status.MOVED;
     },
     inventory: function (player) {
         console.log(`${player.inventory.length}/${player.maxInventorySlots} items full`);
         if (player.inventory.length === 0) {
             console.log('You have nothing!');
-            return false;
+            return helpers.Status.FAILURE;
         }
         Object.keys(allItems).forEach(item => {
             const count = helpers.countItem(player.inventory, item);
@@ -66,11 +73,12 @@ module.exports = {
                 console.log(`${item} x${count}`);
             }
         });
+        return helpers.Status.SUCCESS;
     },
     rummage: function (player) {
         if (player.inventory.length === player.maxInventorySlots) {
             console.error('Your inventory is full! Please drop something first.');
-            return false;
+            return helpers.Status.FAILURE;
         }
         const randItem = helpers.randomItem();
         player.hunger -= helpers.randomInt(3, 5);
@@ -87,31 +95,37 @@ module.exports = {
             }
             allItems[randItem].discovered = true;
         }
+        return helpers.Status.SUCCESS | helpers.Status.MOVED;
     },
     drop: function (player, args) {
         const itemName = args[1];
         if (!itemName) {
             console.error('You did not specify an item to drop.');
-            return false;
+            return helpers.Status.FAILURE;
         }
         const result = helpers.removeItems(player.inventory, {
             [itemName]: 1
         });
         if (result) {
             console.log(`You dropped the ${itemName}.`);
+            return helpers.Status.SUCCESS;
         } else {
             console.log(`Failed to drop a ${itemName}.`);
+            return helpers.Status.FAILURE;
         }
     },
     clear: function () {
         console.clear();
+        return helpers.Status.SUCCESS;
     },
     help: function () {
         console.log(
             Object.keys(module.exports).join(', ')
         );
+        return helpers.Status.SUCCESS;
     },
     quit: function () {
         process.exit(0);
+        return helpers.Status.SUCCESS;
     }
 };
