@@ -1,5 +1,6 @@
 const readline = require('readline-sync');
 const commands = require('./commands.js');
+const helpers = require('./helpers.js');
 
 // player state
 var player = {
@@ -50,7 +51,14 @@ function checkDeath()
  */
 function doCombatTurn()
 {
-    ;
+    if (player.opponent === null) {
+        let findEnemy = helpers.randomInt(1, 30) === 1;
+        if (findEnemy) {
+            let enemy = helpers.randomEnemy();
+            player.opponent = enemy;
+            console.log(`=== ${enemy.description} ===`);
+        }
+    }
 }
 
 

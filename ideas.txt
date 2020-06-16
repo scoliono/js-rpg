@@ -1,7 +1,9 @@
 Combat (wip)
+Don't do enemy encounters when doing a non-moving command
 Invisibility cloak (wip)
 Backpack item (wip- crafting recipe)
 Shield
+Bandages to restore health
 Interacting with multiple-word items (bug)
 Disease/poison (considered)
 Thirst meter (possibly)

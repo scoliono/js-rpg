@@ -1,84 +1,7 @@
 var allItems = require('./items.json');
 var allAnimals = require('./animals.json');
+const helpers = require('./helpers.js');
 const process = require('process');
-
-/**
- * Generates a random integer between min and max.
- * @param Number min  The lowest number in the range
- * @param Number max  The highest number in the range
- * @returns Number
- */
-function randomInt(min, max)
-{
-    return Math.floor(Math.random() * (max - min)) + min;
-}
-
-/**
- * Returns the name of a random item in the game.
- * @returns String
- */
-function randomItem()
-{
-    const total = Object.values(allItems).reduce((t, i) => t + i.rarity, 0);
-    const rand = randomInt(1, total);
-    var tally = 0;
-    for (var item in allItems) {
-        var { rarity } = allItems[item];
-        tally += rarity;
-        if (tally >= rand) {
-            break;
-        }
-    }
-    return item;
-}
-
-/**
- * Counts how many occurences of an item there are in the inventory.
- * @param Array inventory  The player's inventory.
- * @param String item  The item to search for.
- * @returns Number
- */
-function countItem(inventory, item)
-{
-    return inventory.filter(i => i.name === item).length;
-}
-
-/**
- * Find the first occurrence of an item with a matching name
- * in the player's inventory.
- * @param Array inventory  The player's inventory.
- * @param String item  The item's name.
- * @returns Number
- */
-function findItem(inventory, item)
-{
-    return inventory.findIndex(i => i.name === item);
-}
-
-/**
- * Attempts to remove some quantity of an item by name.
- * @param Array inventory  The player's inventory.
- * @param Object item  An object with the key being the item's name, and the value being the quantity to remove.
- * @returns Boolean
- */
-function removeItems(inventory, itemList)
-{
-    // preliminary check that the user has enough of each item to be removed
-    for (let item in itemList) {
-        let requiredCount = itemList[item];
-        if (countItem(inventory, item) < requiredCount) {
-            return false;
-        }
-    }
-    // removes matches one-by-one
-    for (let item in itemList) {
-        for (let i = 0; i < itemList[item]; i++) {
-            let itemIndex = findItem(inventory, item);
-            inventory.splice(itemIndex, 1);
-        }
-    }
-    return true;
-}
 
 module.exports = {
     craft: function (player, args) {
@@ -90,7 +13,7 @@ module.exports = {
         let item = allItems[itemName];
         // only allow already discovered items with ingredients list to be crafted 
         if (item && item.ingredients && item.discovered) {
-            let success = removeItems(player.inventory, item.ingredients);
+            let success = helpers.removeItems(player.inventory, item.ingredients);
             if (success) {
                 player.inventory.push({ name: itemName });
                 console.log(`You crafted a ${itemName}!`);
@@ -110,9 +33,9 @@ module.exports = {
     },
     eat: function (player, args) {
         if (player.hunger < 100) {
-            let success = removeItems(player.inventory, {'Rations': 1});
+            let success = helpers.removeItems(player.inventory, {'Rations': 1});
             if (success) {
-                player.hunger += randomInt(...allItems.Rations.hunger);
+                player.hunger += helpers.randomInt(...allItems.Rations.hunger);
                 player.hunger = Math.min(player.hunger, 100);
             } else {
                 console.error('You have nothing to eat.');
@@ -124,12 +47,12 @@ module.exports = {
     walk: function (player, args) {
         const place = args[1] || 'middle of nowhere';
         console.log(`You walk to the ${place}.`);
-        player.hunger -= randomInt(1, 5);
+        player.hunger -= helpers.randomInt(1, 5);
     },
     run: function (player, args) {
         const place = args[1] || 'middle of nowhere';
         console.log(`You run to the ${place}.`);
-        player.hunger -= randomInt(3, 10);
+        player.hunger -= helpers.randomInt(3, 10);
     },
     inventory: function (player) {
         console.log(`${player.inventory.length}/${player.maxInventorySlots} items full`);
@@ -138,7 +61,7 @@ module.exports = {
             return false;
         }
         Object.keys(allItems).forEach(item => {
-            const count = countItem(player.inventory, item);
+            const count = helpers.countItem(player.inventory, item);
             if (count > 0) {
                 console.log(`${item} x${count}`);
             }
@@ -149,8 +72,8 @@ module.exports = {
             console.error('Your inventory is full! Please drop something first.');
             return false;
         }
-        const randItem = randomItem();
-        player.hunger -= randomInt(3, 5);
+        const randItem = helpers.randomItem();
+        player.hunger -= helpers.randomInt(3, 5);
         if (randItem === 'Nothing') {
             console.log('You didn\'t pick up anything!');
         } else {
@@ -171,7 +94,7 @@ module.exports = {
             console.error('You did not specify an item to drop.');
             return false;
         }
-        const result = removeItems(player.inventory, {
+        const result = helpers.removeItems(player.inventory, {
             [itemName]: 1
         });
         if (result) {
