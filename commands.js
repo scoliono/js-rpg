@@ -132,6 +132,7 @@ module.exports = {
         player.hunger -= randomInt(3, 10);
     },
     inventory: function (player) {
+        console.log(`${player.inventory.length}/${player.maxInventorySlots} items full`);
         if (player.inventory.length === 0) {
             console.log('You have nothing!');
             return false;
@@ -153,9 +154,15 @@ module.exports = {
         if (randItem === 'Nothing') {
             console.log('You didn\'t pick up anything!');
         } else {
-            player.inventory.push({ name: randItem });
-            allItems[randItem].discovered = true;
+            if (!allItems[randItem].hidden) {
+                player.inventory.push({ name: randItem });
+            }
             console.log(`You picked up a ${randItem}!`);
+            if (randItem === 'Backpack') {
+                player.maxInventorySlots += 30;
+                console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
+            }
+            allItems[randItem].discovered = true;
         }
     },
     drop: function (player, args) {

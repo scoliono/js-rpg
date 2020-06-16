@@ -1,19 +1,21 @@
 {
     "Kangarog": {
         "description": "The kangarog (kangaroo + hog) joins the fight!",
-        "moves": ["kick", ],
+        "moves": ["kicks you", "charges at you", "impales you with its tusks"],
         "health": 50,
         "strength": [10, 20],
         "friendly": false
     },
     "Slale": {
         "description": "The slug whale (slale) beaches itself!",
+        "moves": ["smacks you and leaves slime on you"],
         "health": 10,
         "strength": [1, 2],
         "friendly": false
     },
     "Dogark": {
         "description": "A dog shark (dogark) barks and woofs!",
+        "moves": ["bites you"],
         "health": 30,
         "strength": [5, 10],
         "friendly": false

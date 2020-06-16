@@ -1,7 +1,8 @@
 Combat (wip)
 Invisibility cloak (wip)
-Backpack item (wip)
+Backpack item (wip- crafting recipe)
 Shield
+Interacting with multiple-word items (bug)
 Disease/poison (considered)
 Thirst meter (possibly)
 PvP mode / multiplayer (hard)
