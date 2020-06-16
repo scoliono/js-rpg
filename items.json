@@ -1,0 +1,45 @@
+{
+    "Nothing": {
+        "rarity": 30,
+        "hidden": true
+    },
+    "Bow": {
+        "rarity": 3
+    },
+    "Arrow": {
+        "rarity": 6,
+        "ingredients": { "Rock": 1, "Stick": 1 }
+    },
+    "Canteen": {
+        "rarity": 8
+    },
+    "Match": {
+        "rarity": 5
+    },
+    "Rations": {
+        "rarity": 15,
+        "hunger": [5, 15]
+    },
+    "Rock": {
+        "rarity": 10
+    },
+    "Shovel": {
+        "rarity": 4
+    },
+    "Dagger": {
+        "rarity": 4
+    },
+    "Stick": {
+        "rarity": 10
+    },
+    "Sword": {
+        "rarity": 2
+    },
+    "Camo Cloak": {
+        "rarity": 2
+    },
+    "Backpack": {
+        "rarity": 5,
+        "hidden": true
+    }
+}

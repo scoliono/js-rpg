@@ -1,0 +1,26 @@
+{
+    "Kangarog": {
+        "description": "The kangarog (kangaroo + hog) joins the fight!",
+        "moves": ["kick", ],
+        "health": 50,
+        "strength": [10, 20],
+        "friendly": false
+    },
+    "Slale": {
+        "description": "The slug whale (slale) beaches itself!",
+        "health": 10,
+        "strength": [1, 2],
+        "friendly": false
+    },
+    "Dogark": {
+        "description": "A dog shark (dogark) barks and woofs!",
+        "health": 30,
+        "strength": [5, 10],
+        "friendly": false
+    },
+    "Show": {
+        "description": "It's a show! (Sheep + cow) It follows you around, looking for food.",
+        "health": 15,
+        "friendly": true
+    }
+}
