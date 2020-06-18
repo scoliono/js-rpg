@@ -8,7 +8,15 @@
     },
     "Arrow": {
         "rarity": 6,
-        "ingredients": { "Rock": 1, "Stick": 1 }
+        "ingredients": { "Rock": 1, "Stick": 1 },
+        "strength": [15, 25],
+        "moves": ["shot an arrow at"]
+    },
+    "Fists": {
+        "rarity": 0,
+        "hidden": true,
+        "strength": [5, 8],
+        "moves": ["punched", "kicked"]
     },
     "Canteen": {
         "rarity": 4
@@ -21,19 +29,27 @@
         "hunger": [5, 15]
     },
     "Rock": {
-        "rarity": 10
+        "rarity": 10,
+        "strength": [10, 15],
+        "moves": ["threw a rock at"]
     },
     "Shovel": {
         "rarity": 4
     },
     "Dagger": {
-        "rarity": 4
+        "rarity": 4,
+        "strength": [20, 30],
+        "moves": ["cut", "stabbed"]
     },
     "Stick": {
-        "rarity": 10
+        "rarity": 10,
+        "strength": [1, 5],
+        "moves": ["whacked"]
     },
     "Sword": {
-        "rarity": 2
+        "rarity": 2,
+        "strength": [25, 35],
+        "moves": ["slashed at"]
     },
     "Camo Cloak": {
         "rarity": 2

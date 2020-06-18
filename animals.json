@@ -4,7 +4,8 @@
         "description": "The kangarog (kangaroo + hog) joins the fight!",
         "moves": ["kicks you", "charges at you", "impales you with its tusks"],
         "health": 50,
-        "strength": [10, 20],
+        "maxHealth": 50,
+        "strength": [8, 15],
         "friendly": false
     },
     {
@@ -12,6 +13,7 @@
         "description": "The slug whale (slale) beaches itself!",
         "moves": ["smacks you and leaves slime on you"],
         "health": 10,
+        "maxHealth": 10,
         "strength": [1, 2],
         "friendly": false
     },
@@ -20,6 +22,7 @@
         "description": "A dog shark (dogark) barks and woofs!",
         "moves": ["bites you"],
         "health": 30,
+        "maxHealth": 30,
         "strength": [5, 10],
         "friendly": false
     },
@@ -27,6 +30,7 @@
         "name": "Show",
         "description": "It's a show! (Sheep + cow) It follows you around, looking for food.",
         "health": 15,
+        "maxHealth": 15,
         "friendly": true
     }
 ]

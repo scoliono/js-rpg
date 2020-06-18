@@ -1,4 +1,3 @@
-Combat (wip)
 Invisibility cloak (wip)
 Backpack item (wip- crafting recipe)
 Shield / armor
