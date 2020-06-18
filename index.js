@@ -25,7 +25,6 @@ function printStatus()
 {
     console.log();
     console.log(`Health: ${player.health}/100, Hunger: ${player.hunger}/100`);
-    console.log("You're not dead yet!");
 }
 
 /**
@@ -75,12 +74,6 @@ function doCombatTurn()
 var gameOver = false;
 var lastCommand = 0;
 while (!gameOver) {
-    // check if the player moved in the last turn
-    // OR you are currently in combat
-    if ((lastCommand & helpers.Status.MOVED) ||
-        player.opponent) {
-        doCombatTurn();
-    }
     printStatus();
     const args = readline.question('> ').split(' ');
     const command = args[0].toLowerCase();
@@ -88,6 +81,12 @@ while (!gameOver) {
         lastCommand = commands[command](player, args);
     } else {
         console.error('That action is invalid!');
+    }
+    // check if the player moved in the last turn
+    // OR you are currently in combat
+    if ((lastCommand & helpers.Status.MOVED) ||
+        player.opponent) {
+        doCombatTurn();
     }
     gameOver = checkDeath();
 }
