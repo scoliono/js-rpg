@@ -8,7 +8,7 @@ var allAnimals = require('./animals.json');
  * @returns Number
  */
 const randomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 /**
