@@ -1,6 +1,8 @@
 const readline = require('readline-sync');
 const commands = require('./commands.js');
 const helpers = require('./helpers.js');
+const config = require('./config.json');
+
 
 // player state
 var player = {
@@ -60,7 +62,7 @@ function doCombatTurn()
 {
     if (player.opponent === null) {
         // dice roll
-        let findEnemy = helpers.randomInt(1, 5) === 1;
+        let findEnemy = helpers.randomInt(1, 30) === 1;
         if (findEnemy) {
             let enemy = helpers.randomEnemy();
             player.opponent = Object.create(enemy);
@@ -84,17 +86,18 @@ while (!gameOver) {
     printStatus();
     const args = readline.question('> ').split(' ');
     const command = args[0].toLowerCase();
-    if (command in commands) {
+    if (command in commands && (!helpers.cheats.includes(command) || config.dev)) {
         lastCommand = commands[command](player, args);
     } else {
         lastCommand = helpers.Status.FAILURE;
         console.error('That action is invalid!');
     }
-    // check if the player moved in the last turn
-    // OR you are currently in combat
-    if ((lastCommand & helpers.Status.MOVED) ||
-        player.opponent) {
-        doCombatTurn();
+    // if last command did not fail, regardless of combat status
+    if (lastCommand & helpers.Status.SUCCESS) {
+        // check if the player moved in the last turn
+        // OR they are currently in combat
+        if ((lastCommand & helpers.Status.MOVED) || player.opponent)
+            doCombatTurn();
     }
     gameOver = checkDeath();
 }

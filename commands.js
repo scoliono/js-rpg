@@ -1,7 +1,38 @@
 var allItems = require('./items.json');
 var allAnimals = require('./animals.json');
+
+const config = require('./config.json');
 const helpers = require('./helpers.js');
 const process = require('process');
+
+const give = function (player, args) {
+    let itemName = args[1];
+    if (allItems[itemName]) {
+        player.inventory.push({ name: itemName });
+        console.log(`You got a ${itemName}!`);
+        return helpers.Status.SUCCESS;
+    } else {
+        console.error(`Unrecognized item name ${itemName}`);
+        return helpers.Status.FAILURE;
+    }
+};
+
+const spawn = function (player, args) {
+    let animalName = args[1];
+    let animal = allAnimals[animalName];
+    if (animal) {
+        if (animal.friendly) {
+            console.error('Unimplemented');
+            return helpers.Status.FAILURE;
+        } else {
+            player.opponent = Object.create(animal);
+            return helpers.Status.SUCCESS;
+        }
+    } else {
+        console.error(`Unrecognized animal name ${animalName}`);
+        return helpers.Status.FAILURE;
+    }
+};
 
 const craft = function (player, args) {
     let itemName = args[1];
@@ -16,7 +47,7 @@ const craft = function (player, args) {
         if (success) {
             player.inventory.push({ name: itemName });
             console.log(`You crafted a ${itemName}!`);
-            return helpers.status.SUCCESS;
+            return helpers.Status.SUCCESS;
         } else {
             console.log(`To craft a ${itemName} you need:`);
             for (let ingredient in item.ingredients) {
@@ -155,9 +186,11 @@ const clear = function () {
 };
 
 const help = function () {
-    console.log(
-        Object.keys(module.exports).join(', ')
-    );
+    let cmds = Object.keys(module.exports);
+    if (!config.dev) {
+        cmds = cmds.filter(cmd => !helpers.cheats.includes(cmd));
+    }
+    console.log(cmds.join(', '));
     return helpers.Status.SUCCESS;
 };
 
@@ -169,5 +202,5 @@ const quit = function () {
 module.exports = {
     craft, eat, walk, run, attack,
     inventory, rummage, drop,
-    clear, help, quit
+    clear, help, quit, give, spawn
 };
