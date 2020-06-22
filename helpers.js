@@ -56,6 +56,24 @@ const findItem = (inventory, item) => {
 };
 
 /**
+ * Gives an item to the player and runs additional logic if needed.
+ * @param Object player
+ * @param Object items  The items database.
+ * @param String itemName
+ */
+const giveItem = (player, items, itemName) => {
+    if (!items[itemName].hidden) {
+        player.inventory.push({ name: itemName });
+    }
+    console.log(`You picked up a ${itemName}!`);
+    if (itemName === 'Backpack') {
+        player.maxInventorySlots += 30;
+        console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
+    }
+    items[itemName].discovered = true;
+};
+
+/**
  * Attempts to remove some quantity of an item by name.
  * @param Array inventory  The player's inventory.
  * @param Object item  An object with the key being the item's name, and the value being the quantity to remove.
@@ -80,6 +98,14 @@ const removeItems = (inventory, itemList) => {
 };
 
 /**
+ * Finds an animal by name.
+ * @returns Object
+ */
+const findAnimal = name => {
+    return allAnimals.find(a => a.name === name);
+};
+
+/**
  * Gets a random enemy.
  * @returns Object
  */
@@ -101,6 +127,8 @@ module.exports = {
     randomItem,
     countItem,
     findItem,
+    giveItem,
+    findAnimal,
     removeItems,
     randomEnemy,
     randomChoice,

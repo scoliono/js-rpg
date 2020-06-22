@@ -8,8 +8,7 @@ const process = require('process');
 const give = function (player, args) {
     let itemName = args[1];
     if (allItems[itemName]) {
-        player.inventory.push({ name: itemName });
-        console.log(`You got a ${itemName}!`);
+        helpers.giveItem(player, allItems, itemName);
         return helpers.Status.SUCCESS;
     } else {
         console.error(`Unrecognized item name ${itemName}`);
@@ -19,7 +18,7 @@ const give = function (player, args) {
 
 const spawn = function (player, args) {
     let animalName = args[1];
-    let animal = allAnimals[animalName];
+    let animal = helpers.findAnimal(animalName);
     if (animal) {
         if (animal.friendly) {
             console.error('Unimplemented');
@@ -120,15 +119,7 @@ const rummage = function (player) {
     if (randItem === 'Nothing') {
         console.log('You didn\'t pick up anything!');
     } else {
-        if (!allItems[randItem].hidden) {
-            player.inventory.push({ name: randItem });
-        }
-        console.log(`You picked up a ${randItem}!`);
-        if (randItem === 'Backpack') {
-            player.maxInventorySlots += 30;
-            console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
-        }
-        allItems[randItem].discovered = true;
+        helpers.giveItem(player, allItems, randItem);
     }
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };
