@@ -87,6 +87,7 @@ while (!gameOver) {
     if (command in commands) {
         lastCommand = commands[command](player, args);
     } else {
+        lastCommand = helpers.Status.FAILURE;
         console.error('That action is invalid!');
     }
     // check if the player moved in the last turn
