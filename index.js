@@ -63,7 +63,7 @@ function doCombatTurn()
         let findEnemy = helpers.randomInt(1, 5) === 1;
         if (findEnemy) {
             let enemy = helpers.randomEnemy();
-            player.opponent = enemy;
+            player.opponent = Object.create(enemy);
             console.log(`=== You encountered a ${enemy.name}!  ===`);
             console.log(`=== ${enemy.description} ===`);
         }
