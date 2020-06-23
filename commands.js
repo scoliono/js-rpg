@@ -133,9 +133,18 @@ const attack = function (player, args) {
     let itemName = args[1];
     if (itemName) {
         // check that you have the weapon you want to attack with
-        if (itemName === 'Bow') itemName = 'Arrow';
         if (helpers.countItem(player.inventory, itemName) === 0) {
             console.error('You don\'t have that weapon.');
+            return helpers.Status.FAILURE;
+        }
+        // if you are attacking with Arrow, make sure you have a bow
+        if (itemName === 'Arrow' && helpers.countItem(player.inventory, 'Bow') === 0) {
+            console.error('You need a Bow to shoot Arrows.');
+            return helpers.Status.FAILURE;
+        }
+        // if you are attacking with Bow, make sure you have an arrow
+        else if (itemName === 'Bow' && helpers.countItem(player.inventory, 'Arrow') === 0) {
+            console.error('You need an Arrow to use a Bow.');
             return helpers.Status.FAILURE;
         }
     } else {
@@ -147,10 +156,25 @@ const attack = function (player, args) {
     let move = helpers.randomChoice(weapon.moves);
     console.log(`=== You ${move} the ${player.opponent.name}, doing ${dmg} HP of damage ===`);
     // if the player shot an arrow, remove it from the inventory
-    if (itemName === 'Arrow') {
+    if (itemName === 'Arrow' || itemName === 'Bow') {
         helpers.removeItems(player.inventory, { Arrow: 1 });
     }
     return helpers.Status.SUCCESS;
+};
+
+const heal = function (player, args) {
+    const result = helpers.removeItems(player.inventory, {
+        Bandage: 1
+    });
+    if (result) {
+        const healed = helpers.randomInt(...allItems.Bandage.healing);
+        player.health += healed;
+        console.log(`You used 1 Bandage and restored ${healed} HP.`);
+        return helpers.Status.SUCCESS;
+    } else {
+        console.error('You do not have any Bandages to heal yourself with.');
+        return helpers.Status.FAILURE;
+    }
 };
 
 const drop = function (player, args) {
@@ -179,7 +203,7 @@ const clear = function () {
 const help = function () {
     let cmds = Object.keys(module.exports);
     if (!config.dev) {
-        cmds = cmds.filter(cmd => !helpers.cheats.includes(cmd));
+        cmds = cmds.filter(cmd => !helpers.Cheats.includes(cmd));
     }
     console.log(cmds.join(', '));
     return helpers.Status.SUCCESS;
@@ -191,7 +215,7 @@ const quit = function () {
 };
 
 module.exports = {
-    craft, eat, walk, run, attack,
+    craft, eat, heal, walk, run, attack,
     inventory, rummage, drop,
     clear, help, quit, give, spawn
 };

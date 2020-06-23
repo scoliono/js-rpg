@@ -4,7 +4,11 @@
         "hidden": true
     },
     "Bow": {
-        "rarity": 3
+        "rarity": 5
+    },
+    "Bandage": {
+        "rarity": 8,
+        "healing": [5, 10]
     },
     "Arrow": {
         "rarity": 6,

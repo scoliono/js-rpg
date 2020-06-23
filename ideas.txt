@@ -1,7 +1,7 @@
+Friendly animals
 Invisibility cloak (wip)
 Backpack item (wip- crafting recipe)
 Shield / armor
-Bandages to restore health
 Interacting with multiple-word items (bug)
 Disease/poison (considered)
 Thirst meter (possibly)

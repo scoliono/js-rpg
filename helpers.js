@@ -120,7 +120,7 @@ const Status = {
     MOVED: 2
 };
 
-const cheats = ['give', 'spawn'];
+const Cheats = ['give', 'spawn'];
 
 module.exports = {
     randomInt,
@@ -133,5 +133,5 @@ module.exports = {
     randomEnemy,
     randomChoice,
     Status,
-    cheats
+    Cheats
 };

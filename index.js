@@ -86,7 +86,7 @@ while (!gameOver) {
     printStatus();
     const args = readline.question('> ').split(' ');
     const command = args[0].toLowerCase();
-    if (command in commands && (!helpers.cheats.includes(command) || config.dev)) {
+    if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
         lastCommand = commands[command](player, args);
     } else {
         lastCommand = helpers.Status.FAILURE;
