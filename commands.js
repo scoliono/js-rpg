@@ -6,7 +6,7 @@ const helpers = require('./helpers.js');
 const process = require('process');
 
 const give = function (player, args) {
-    let itemName = args[1];
+    let itemName = helpers.multiWordArg(args);
     if (allItems[itemName]) {
         helpers.giveItem(player, allItems, itemName);
         return helpers.Status.SUCCESS;
@@ -17,7 +17,7 @@ const give = function (player, args) {
 };
 
 const spawn = function (player, args) {
-    let animalName = args[1];
+    let animalName = helpers.multiWordArg(args);
     let animal = helpers.findAnimal(animalName);
     if (animal) {
         if (animal.friendly) {
@@ -34,7 +34,7 @@ const spawn = function (player, args) {
 };
 
 const craft = function (player, args) {
-    let itemName = args[1];
+    let itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to craft.');
         return helpers.Status.FAILURE;
@@ -79,7 +79,7 @@ const eat = function (player, args) {
 };
 
 const walk = function (player, args) {
-    const place = args[1] || 'middle of nowhere';
+    const place = helpers.multiWordArg(args) || 'middle of nowhere';
     console.log(`You walk to the ${place}.`);
     player.hunger -= helpers.randomInt(1, 5);
     player.justMoved = true;
@@ -87,7 +87,7 @@ const walk = function (player, args) {
 };
 
 const run = function (player, args) {
-    const place = args[1] || 'middle of nowhere';
+    const place = helpers.multiWordArg(args) || 'middle of nowhere';
     console.log(`You run to the ${place}.`);
     player.hunger -= helpers.randomInt(3, 10);
     player.justMoved = true;
@@ -130,7 +130,7 @@ const attack = function (player, args) {
         console.error('You are not fighting anything.');
         return helpers.Status.FAILURE;
     }
-    let itemName = args[1];
+    let itemName = helpers.multiWordArg(args);
     if (itemName) {
         // check that you have the weapon you want to attack with
         if (helpers.countItem(player.inventory, itemName) === 0) {
@@ -178,7 +178,7 @@ const heal = function (player, args) {
 };
 
 const drop = function (player, args) {
-    const itemName = args[1];
+    const itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to drop.');
         return helpers.Status.FAILURE;

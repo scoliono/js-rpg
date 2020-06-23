@@ -112,6 +112,14 @@ const findAnimal = name => {
 const randomEnemy = () => randomChoice(allAnimals.filter(a => !a.friendly));
 
 /**
+ * Extracts an argument from the end of a command that may be multiple words long. Useful for getting item/animal names.
+ * @param Array args
+ * @param [Number=1] index
+ * @return String
+ */
+const multiWordArg = (args, index = 1) => args.slice(index).join(' ');
+
+/**
  * A list of all status codes that a command can return.
  */
 const Status = {
@@ -128,6 +136,7 @@ module.exports = {
     countItem,
     findItem,
     giveItem,
+    multiWordArg,
     findAnimal,
     removeItems,
     randomEnemy,

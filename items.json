@@ -7,7 +7,7 @@
         "rarity": 5
     },
     "Bandage": {
-        "rarity": 8,
+        "rarity": 10,
         "healing": [5, 10]
     },
     "Arrow": {
