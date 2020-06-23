@@ -195,6 +195,11 @@ const drop = function (player, args) {
     }
 };
 
+const equip = function (player, args) {
+    const itemName = helpers.multiWordArg(args);
+    const 
+};
+
 const clear = function () {
     console.clear();
     return helpers.Status.NO_ACTION;
@@ -216,6 +221,6 @@ const quit = function () {
 
 module.exports = {
     craft, eat, heal, walk, run, attack,
-    inventory, rummage, drop,
+    inventory, rummage, drop, equip,
     clear, help, quit, give, spawn
 };

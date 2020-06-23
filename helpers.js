@@ -62,8 +62,12 @@ const findItem = (inventory, item) => {
  * @param String itemName
  */
 const giveItem = (player, items, itemName) => {
-    if (!items[itemName].hidden) {
-        player.inventory.push({ name: itemName });
+    const item = items[itemName];
+    if (!item.hidden) {
+        player.inventory.push({
+            name: itemName,
+            durability: item.durability
+        });
     }
     console.log(`You picked up a ${itemName}!`);
     if (itemName === 'Backpack') {

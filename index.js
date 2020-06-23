@@ -11,6 +11,7 @@ var player = {
     inventory: [],
     // [ {name: "Shovel", life: 0.5}, {name: "Shovel", life: 0.75}, {name: "Rock"} ]
     opponent: null,
+    shield: null,
     maxInventorySlots: 10
 };
 

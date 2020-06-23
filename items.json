@@ -6,6 +6,11 @@
     "Bow": {
         "rarity": 5
     },
+    "Shield": {
+        "rarity": 4,
+        "equippable": true,
+        "durability": 25
+    },
     "Bandage": {
         "rarity": 10,
         "healing": [5, 10]
@@ -56,7 +61,8 @@
         "moves": ["slashed at"]
     },
     "Camo Cloak": {
-        "rarity": 2
+        "rarity": 2,
+        "equippable": true
     },
     "Backpack": {
         "rarity": 10,
