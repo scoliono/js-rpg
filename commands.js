@@ -12,7 +12,7 @@ const give = function (player, args) {
         return helpers.Status.SUCCESS;
     } else {
         console.error(`Unrecognized item name ${itemName}`);
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
 };
 
@@ -22,14 +22,14 @@ const spawn = function (player, args) {
     if (animal) {
         if (animal.friendly) {
             console.error('Unimplemented');
-            return helpers.Status.FAILURE;
+            return helpers.Status.NO_ACTION;
         } else {
             player.opponent = Object.create(animal);
             return helpers.Status.SUCCESS;
         }
     } else {
         console.error(`Unrecognized animal name ${animalName}`);
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
 };
 
@@ -37,7 +37,7 @@ const craft = function (player, args) {
     let itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to craft.');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
     let item = allItems[itemName];
     // only allow already discovered items with ingredients list to be crafted 
@@ -53,11 +53,11 @@ const craft = function (player, args) {
                 let requiredCount = item.ingredients[ingredient];
                 console.log(`- ${requiredCount}x ${ingredient}`);
             }
-            return helpers.Status.FAILURE;
+            return helpers.Status.NO_ACTION;
         }
     } else {
         console.log('You\'ve never heard of that before.');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
 };
 
@@ -70,11 +70,11 @@ const eat = function (player, args) {
             return helpers.Status.SUCCESS;
         } else {
             console.error('You have nothing to eat.');
-            return helpers.Status.FAILURE;
+            return helpers.Status.NO_ACTION;
         }
     } else {
         console.error('You are not hungry.');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
 };
 
@@ -98,7 +98,7 @@ const inventory = function (player) {
     console.log(`${player.inventory.length}/${player.maxInventorySlots} items full`);
     if (player.inventory.length === 0) {
         console.log('You have nothing!');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
     Object.keys(allItems).forEach(item => {
         const count = helpers.countItem(player.inventory, item);
@@ -106,13 +106,13 @@ const inventory = function (player) {
             console.log(`${item} x${count}`);
         }
     });
-    return helpers.Status.SUCCESS;
+    return helpers.Status.NO_ACTION;
 };
 
 const rummage = function (player) {
     if (player.inventory.length === player.maxInventorySlots) {
         console.error('Your inventory is full! Please drop something first.');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
     const randItem = helpers.randomItem();
     player.hunger -= helpers.randomInt(3, 5);
@@ -128,24 +128,24 @@ const attack = function (player, args) {
     // make sure the player is in combat
     if (!player.opponent) {
         console.error('You are not fighting anything.');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
     let itemName = helpers.multiWordArg(args);
     if (itemName) {
         // check that you have the weapon you want to attack with
         if (helpers.countItem(player.inventory, itemName) === 0) {
             console.error('You don\'t have that weapon.');
-            return helpers.Status.FAILURE;
+            return helpers.Status.NO_ACTION;
         }
         // if you are attacking with Arrow, make sure you have a bow
         if (itemName === 'Arrow' && helpers.countItem(player.inventory, 'Bow') === 0) {
             console.error('You need a Bow to shoot Arrows.');
-            return helpers.Status.FAILURE;
+            return helpers.Status.NO_ACTION;
         }
         // if you are attacking with Bow, make sure you have an arrow
         else if (itemName === 'Bow' && helpers.countItem(player.inventory, 'Arrow') === 0) {
             console.error('You need an Arrow to use a Bow.');
-            return helpers.Status.FAILURE;
+            return helpers.Status.NO_ACTION;
         }
     } else {
         itemName = 'Fists';
@@ -173,7 +173,7 @@ const heal = function (player, args) {
         return helpers.Status.SUCCESS;
     } else {
         console.error('You do not have any Bandages to heal yourself with.');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
 };
 
@@ -181,7 +181,7 @@ const drop = function (player, args) {
     const itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to drop.');
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
     const result = helpers.removeItems(player.inventory, {
         [itemName]: 1
@@ -191,13 +191,13 @@ const drop = function (player, args) {
         return helpers.Status.SUCCESS;
     } else {
         console.log(`Failed to drop a ${itemName}.`);
-        return helpers.Status.FAILURE;
+        return helpers.Status.NO_ACTION;
     }
 };
 
 const clear = function () {
     console.clear();
-    return helpers.Status.SUCCESS;
+    return helpers.Status.NO_ACTION;
 };
 
 const help = function () {
@@ -206,12 +206,12 @@ const help = function () {
         cmds = cmds.filter(cmd => !helpers.Cheats.includes(cmd));
     }
     console.log(cmds.join(', '));
-    return helpers.Status.SUCCESS;
+    return helpers.Status.NO_ACTION;
 };
 
 const quit = function () {
     process.exit(0);
-    return helpers.Status.SUCCESS;
+    return helpers.Status.NO_ACTION;
 };
 
 module.exports = {

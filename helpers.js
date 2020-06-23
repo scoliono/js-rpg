@@ -123,7 +123,7 @@ const multiWordArg = (args, index = 1) => args.slice(index).join(' ');
  * A list of all status codes that a command can return.
  */
 const Status = {
-    FAILURE: 0,
+    NO_ACTION: 0,
     SUCCESS: 1,
     MOVED: 2
 };

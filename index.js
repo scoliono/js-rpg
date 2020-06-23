@@ -89,7 +89,7 @@ while (!gameOver) {
     if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
         lastCommand = commands[command](player, args);
     } else {
-        lastCommand = helpers.Status.FAILURE;
+        lastCommand = helpers.Status.NO_ACTION;
         console.error('That action is invalid!');
     }
     // if last command did not fail, regardless of combat status
