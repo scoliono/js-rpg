@@ -8,8 +8,12 @@ const process = require('process');
 const give = function (player, args) {
     let itemName = helpers.multiWordArg(args);
     if (allItems[itemName]) {
-        helpers.giveItem(player, allItems, itemName);
-        return helpers.Status.SUCCESS;
+        if (helpers.giveItem(player, allItems, itemName)) {
+            return helpers.Status.SUCCESS;
+        } else {
+            console.error('Your inventory is full.');
+            return helpers.Status.NO_ACTION;
+        }
     } else {
         console.error(`Unrecognized item name ${itemName}`);
         return helpers.Status.NO_ACTION;
@@ -197,7 +201,35 @@ const drop = function (player, args) {
 
 const equip = function (player, args) {
     const itemName = helpers.multiWordArg(args);
-    const 
+    if (!allItems[itemName].equippable) {
+        console.error('You cannot equip that.');
+        return helpers.Status.NO_ACTION;
+    }
+    if (player.shield) {
+        console.error(`You already have a ${player.shield.name} equipped.`);
+        return helpers.Status.NO_ACTION;
+    }
+    const result = helpers.removeItems(player.inventory, { [itemName]: 1 });
+    if (result) {
+        player.shield = result[0];
+        console.log(`You equipped a ${result[0].name}, with durability ${result[0].durability}/${result[0].maxDurability}.`);
+        return helpers.Status.SUCCESS;
+    } else {
+        console.error('You can\'t equip that since you don\'t have it.');
+        return helpers.Status.NO_ACTION;
+    }
+};
+
+const unequip = function (player, args) {
+    if (player.inventory.length === player.maxInventorySlots) {
+        console.error('You need to get rid of something before unequipping.');
+        return helpers.Status.NO_ACTION;
+    }
+    const shield = player.shield;
+    player.inventory.push(player.shield);
+    player.shield = null;
+    console.log(`Unequipped the ${shield.name}.`);
+    return helpers.Status.SUCCESS;
 };
 
 const clear = function () {
@@ -221,6 +253,6 @@ const quit = function () {
 
 module.exports = {
     craft, eat, heal, walk, run, attack,
-    inventory, rummage, drop, equip,
+    inventory, rummage, drop, equip, unequip,
     clear, help, quit, give, spawn
 };

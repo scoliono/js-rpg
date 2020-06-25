@@ -30,6 +30,9 @@ function printStatus()
     if (player.opponent) {
         console.log(`=== ${player.opponent.name}: ${player.opponent.health}/${player.opponent.maxHealth} HP ===`);
     }
+    if (player.shield) {
+        console.log(`Equipping a ${player.shield.name}: ${player.shield.durability}/${player.shield.maxDurability} durability`);
+    }
     console.log(`Health: ${player.health}/100, Hunger: ${player.hunger}/100`);
 }
 

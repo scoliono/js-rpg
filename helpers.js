@@ -60,13 +60,18 @@ const findItem = (inventory, item) => {
  * @param Object player
  * @param Object items  The items database.
  * @param String itemName
+ * @returns Boolean
  */
 const giveItem = (player, items, itemName) => {
+    if (player.inventory.length >= player.maxInventorySlots) {
+        return false;
+    }
     const item = items[itemName];
     if (!item.hidden) {
         player.inventory.push({
             name: itemName,
-            durability: item.durability
+            durability: item.durability,
+            maxDurability: item.durability
         });
     }
     console.log(`You picked up a ${itemName}!`);
@@ -75,6 +80,7 @@ const giveItem = (player, items, itemName) => {
         console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
     }
     items[itemName].discovered = true;
+    return true;
 };
 
 /**
@@ -92,13 +98,14 @@ const removeItems = (inventory, itemList) => {
         }
     }
     // removes matches one-by-one
+    let removed = [];
     for (let item in itemList) {
         for (let i = 0; i < itemList[item]; i++) {
             let itemIndex = findItem(inventory, item);
-            inventory.splice(itemIndex, 1);
+            removed = removed.concat(inventory.splice(itemIndex, 1));
         }
     }
-    return true;
+    return removed;
 };
 
 /**
