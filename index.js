@@ -78,6 +78,17 @@ function doCombatTurn()
         let randMove = helpers.randomChoice(player.opponent.moves);
         let dmg = helpers.randomInt(...player.opponent.strength);
         console.log(`=== The ${player.opponent.name} ${randMove}, doing ${dmg} HP of damage! ===`);
+        if (player.shield) {
+            let maxDmgAbsorbed = Math.ceil(dmg / 2);
+            let actualDmgAbsorbed = Math.min(player.shield.durability, maxDmgAbsorbed);
+            player.shield.durability -= actualDmgAbsorbed;
+            if (player.shield.durability === 0) {
+                const shield = player.shield;
+                player.shield = null;
+                console.log(`Your ${shield.name} broke!`);
+            }
+            dmg -= actualDmgAbsorbed;
+        }
         player.health -= dmg;
     }
 }

@@ -9,7 +9,7 @@
     "Shield": {
         "rarity": 4,
         "equippable": true,
-        "durability": 25
+        "durability": 50
     },
     "Bandage": {
         "rarity": 10,
