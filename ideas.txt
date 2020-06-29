@@ -1,5 +1,4 @@
 Friendly animals
-Backpack item (wip- crafting recipe)
 Daylight cycle
 Recall commands with up/down arrow keys
 Disease/poison (considered)

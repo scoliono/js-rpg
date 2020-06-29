@@ -67,6 +67,16 @@
     },
     "Backpack": {
         "rarity": 10,
-        "hidden": true
+        "hidden": true,
+        "ingredients": { "Leather": 5 }
+    },
+    "Leather": {
+        "rarity": 0
+    },
+    "Belt": {
+        "rarity": 0,
+        "strength": [15, 25],
+        "ingredients": { "Leather": 3 },
+        "moves": ["whipped", "lashed"]
     }
 }

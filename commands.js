@@ -25,8 +25,8 @@ const spawn = function (player, args) {
     let animal = helpers.findAnimal(animalName);
     if (animal) {
         if (animal.friendly) {
-            console.error('Unimplemented');
-            return helpers.Status.NO_ACTION;
+            player.pet = Object.create(animal);
+            return helpers.Status.SUCCESS;
         } else {
             player.opponent = Object.create(animal);
             return helpers.Status.SUCCESS;

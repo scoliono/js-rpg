@@ -11,6 +11,7 @@ var player = {
     inventory: [],
     // [ {name: "Shovel", life: 0.5}, {name: "Shovel", life: 0.75}, {name: "Rock"} ]
     opponent: null,
+    pet: null,
     shield: null,
     maxInventorySlots: 10
 };
@@ -28,7 +29,10 @@ function printStatus()
 {
     console.log();
     if (player.opponent) {
-        console.log(`=== ${player.opponent.name}: ${player.opponent.health}/${player.opponent.maxHealth} HP ===`);
+        console.log(`=== Enemy ${player.opponent.name}: ${player.opponent.health}/${player.opponent.maxHealth} HP ===`);
+    }
+    if (player.pet) {
+        console.log(`=== Friendly ${player.pet.name}: ${player.pet.health}/${player.pet.maxHealth} HP ===`);
     }
     if (player.shield) {
         let durabilityStr;
@@ -65,6 +69,29 @@ function checkDeath()
 }
 
 /**
+ * If the player does not have a pet, run a random probability for encountering a friendly animal. If the player has food, this probability increases.
+ * If the player has food, the animal will also continue to follow them. Otherwise, it will leave on the next turn.
+ */
+function doPetTurn()
+{
+    let hasFood = helpers.countItem(player.inventory, 'Rations') > 0;
+    if (player.pet === null) {
+        // dice roll
+        let findPet = helpers.randomInt(1, hasFood ? 10 : 15) === 1;
+        if (findPet) {
+            let pet = helpers.randomPet();
+            player.pet = Object.create(pet);
+            console.log(`=== You encountered a friendly ${pet.name}!  ===`);
+            console.log(`=== ${pet.description} ===`);
+        }
+    } else if (!hasFood) {
+        let oldPet = player.pet;
+        player.pet = null;
+        console.log(`=== The ${oldPet.name} wandered off. ===`);
+    }
+}
+
+/**
  * If the player has no opponent, run a random probability for encountering one.
  * Otherwise, take one turn fighting the player.
  */
@@ -77,7 +104,7 @@ function doCombatTurn()
         if (findEnemy) {
             let enemy = helpers.randomEnemy();
             player.opponent = Object.create(enemy);
-            console.log(`=== You encountered a ${enemy.name}!  ===`);
+            console.log(`=== You encountered an enemy ${enemy.name}!  ===`);
             console.log(`=== ${enemy.description} ===`);
         }
     } else {
@@ -120,8 +147,10 @@ while (!gameOver) {
     if (lastCommand & helpers.Status.SUCCESS) {
         // check if the player moved in the last turn
         // OR they are currently in combat
-        if ((lastCommand & helpers.Status.MOVED) || player.opponent)
+        if ((lastCommand & helpers.Status.MOVED) || player.opponent) {
             doCombatTurn();
+            doPetTurn();
+        }
     }
     gameOver = checkDeath();
 }

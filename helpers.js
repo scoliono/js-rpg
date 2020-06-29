@@ -123,6 +123,12 @@ const findAnimal = name => {
 const randomEnemy = () => randomChoice(allAnimals.filter(a => !a.friendly));
 
 /**
+ * Gets a random pet.
+ * @returns Object
+ */
+const randomPet = () => randomChoice(allAnimals.filter(a => a.friendly));
+
+/**
  * Extracts an argument from the end of a command that may be multiple words long. Useful for getting item/animal names.
  * @param Array args
  * @param [Number=1] index
@@ -151,6 +157,7 @@ module.exports = {
     findAnimal,
     removeItems,
     randomEnemy,
+    randomPet,
     randomChoice,
     Status,
     Cheats
