@@ -70,8 +70,8 @@ const giveItem = (player, items, itemName) => {
     if (!item.hidden) {
         player.inventory.push({
             name: itemName,
-            durability: item.durability,
-            maxDurability: item.durability
+            durability: +item.durability,
+            maxDurability: +item.durability
         });
     }
     console.log(`You picked up a ${itemName}!`);

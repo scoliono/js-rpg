@@ -31,7 +31,13 @@ function printStatus()
         console.log(`=== ${player.opponent.name}: ${player.opponent.health}/${player.opponent.maxHealth} HP ===`);
     }
     if (player.shield) {
-        console.log(`Equipping a ${player.shield.name}: ${player.shield.durability}/${player.shield.maxDurability} durability`);
+        let durabilityStr;
+        if (player.shield.maxDurability === Infinity) {
+            durabilityStr = ' (unbreakable)';
+        } else {
+            durabilityStr = `: ${player.shield.durability}/${player.shield.maxDurability} durability`;
+        }
+        console.log(`Equipped a ${player.shield.name}${durabilityStr}`);
     }
     console.log(`Health: ${player.health}/100, Hunger: ${player.hunger}/100`);
 }
@@ -66,7 +72,8 @@ function doCombatTurn()
 {
     if (player.opponent === null) {
         // dice roll
-        let findEnemy = helpers.randomInt(1, 30) === 1;
+        let hasCloak = player.shield && player.shield.name === 'Camo Cloak';
+        let findEnemy = helpers.randomInt(1, hasCloak ? 90 : 30) === 1;
         if (findEnemy) {
             let enemy = helpers.randomEnemy();
             player.opponent = Object.create(enemy);
@@ -78,7 +85,9 @@ function doCombatTurn()
         let randMove = helpers.randomChoice(player.opponent.moves);
         let dmg = helpers.randomInt(...player.opponent.strength);
         console.log(`=== The ${player.opponent.name} ${randMove}, doing ${dmg} HP of damage! ===`);
-        if (player.shield) {
+        // if player is equipping something without infinite durability,
+        // have it absorb roughly half the damage
+        if (player.shield && player.shield.maxDurability !== Infinity) {
             let maxDmgAbsorbed = Math.ceil(dmg / 2);
             let actualDmgAbsorbed = Math.min(player.shield.durability, maxDmgAbsorbed);
             player.shield.durability -= actualDmgAbsorbed;

@@ -1,6 +1,4 @@
-Shield (wip)
 Friendly animals
-Invisibility cloak (wip)
 Backpack item (wip- crafting recipe)
 Daylight cycle
 Recall commands with up/down arrow keys

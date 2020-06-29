@@ -212,7 +212,13 @@ const equip = function (player, args) {
     const result = helpers.removeItems(player.inventory, { [itemName]: 1 });
     if (result) {
         player.shield = result[0];
-        console.log(`You equipped a ${result[0].name}, with durability ${result[0].durability}/${result[0].maxDurability}.`);
+        let durabilityStr;
+        if (player.shield.maxDurability === Infinity) {
+            durabilityStr = 'Unbreakable';
+        } else {
+            durabilityStr = `${result[0].durability}/${result[0].maxDurability}`;
+        }
+        console.log(`You equipped a ${result[0].name}, with durability ${durabilityStr}.`);
         return helpers.Status.SUCCESS;
     } else {
         console.error('You can\'t equip that since you don\'t have it.');
