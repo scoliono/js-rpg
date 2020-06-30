@@ -13,7 +13,8 @@
     },
     "Bandage": {
         "rarity": 10,
-        "healing": [5, 10]
+        "healing": [5, 10],
+        "ingredients": { "Wool": 1 }
     },
     "Arrow": {
         "rarity": 6,
@@ -78,5 +79,8 @@
         "strength": [15, 25],
         "ingredients": { "Leather": 3 },
         "moves": ["whipped", "lashed"]
+    },
+    "Wool": {
+        "rarity": 0
     }
 }

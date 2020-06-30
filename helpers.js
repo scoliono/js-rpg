@@ -59,34 +59,45 @@ const findItem = (inventory, item) => {
  * Gives an item to the player and runs additional logic if needed.
  * @param Object player
  * @param Object items  The items database.
- * @param String itemName
+ * @param Object itemList  An object with the key being the item's name, and the value being the quantity to add.
  * @returns Boolean
  */
-const giveItem = (player, items, itemName) => {
-    if (player.inventory.length >= player.maxInventorySlots) {
+const giveItem = (player, items, itemList) => {
+    // preliminary check that player has enough inv slots
+    const total = Object.values(itemList).reduce((t, q) => t + q, 0);
+    if (player.inventory.length + total > player.maxInventorySlots) {
+        //TODO: prompt user to drop something
         return false;
     }
-    const item = items[itemName];
-    if (!item.hidden) {
-        player.inventory.push({
-            name: itemName,
-            durability: +item.durability,
-            maxDurability: +item.durability
-        });
+    let strList = [];
+    for (let itemName in itemList) {
+        const item = items[itemName];
+        const quantity = itemList[itemName];
+        if (itemName === 'Backpack') {
+            player.maxInventorySlots += 30 * quantity;
+            console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
+        }
+        items[itemName].discovered = true;
+        strList.push(`${quantity}x ${itemName}`);
+        // don't add hidden items to inv
+        if (item.hidden) continue;
+        // adds appropriate quantity of that item
+        for (let i = 0; i < quantity; i++) {
+            player.inventory.push({
+                name: itemName,
+                durability: +item.durability,
+                maxDurability: +item.durability
+            });
+        }
     }
-    console.log(`You picked up a ${itemName}!`);
-    if (itemName === 'Backpack') {
-        player.maxInventorySlots += 30;
-        console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
-    }
-    items[itemName].discovered = true;
+    console.log(`You picked up: ${strList.join(', ')}!`);
     return true;
 };
 
 /**
  * Attempts to remove some quantity of an item by name.
  * @param Array inventory  The player's inventory.
- * @param Object item  An object with the key being the item's name, and the value being the quantity to remove.
+ * @param Object itemList  An object with the key being the item's name, and the value being the quantity to remove.
  * @returns Boolean
  */
 const removeItems = (inventory, itemList) => {

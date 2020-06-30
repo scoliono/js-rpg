@@ -129,12 +129,26 @@ const rummage = function (player) {
 };
 
 const attack = function (player, args) {
-    // make sure the player is in combat
-    if (!player.opponent) {
-        console.error('You are not fighting anything.');
+    let target;
+    switch (args[1]) {
+        case 'enemy':
+        case 'e':
+            target = player.opponent;
+            break;
+        case 'friendly':
+        case 'f':
+            target = player.pet;
+            break;
+        default:
+            console.error('You need to attack either an "enemy" or "friendly" animal.');
+            return helpers.Status.NO_ACTION;
+    }
+    // make sure the player's target exists
+    if (!target) {
+        console.error('There is no animal to fight.');
         return helpers.Status.NO_ACTION;
     }
-    let itemName = helpers.multiWordArg(args);
+    let itemName = helpers.multiWordArg(args, 2);
     if (itemName) {
         // check that you have the weapon you want to attack with
         if (helpers.countItem(player.inventory, itemName) === 0) {
@@ -156,9 +170,9 @@ const attack = function (player, args) {
     }
     let weapon = allItems[itemName];
     let dmg = helpers.randomInt(...weapon.strength);
-    player.opponent.health -= dmg;
+    target.health -= dmg;
     let move = helpers.randomChoice(weapon.moves);
-    console.log(`=== You ${move} the ${player.opponent.name}, doing ${dmg} HP of damage ===`);
+    console.log(`=== You ${move} the ${target.name}, doing ${dmg} HP of damage ===`);
     // if the player shot an arrow, remove it from the inventory
     if (itemName === 'Arrow' || itemName === 'Bow') {
         helpers.removeItems(player.inventory, { Arrow: 1 });

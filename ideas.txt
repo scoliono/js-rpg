@@ -1,3 +1,4 @@
+WIP - new giveItem logic
 Friendly animals
 Daylight cycle
 Recall commands with up/down arrow keys

@@ -54,8 +54,24 @@ function checkDeath()
 {
     // check if opponent has died, and remove it if it has
     if (player.opponent && player.opponent.health <= 0) {
-        console.log(`=== The ${player.opponent.name} died! ===`);
+        let opponent = player.opponent;
         player.opponent = null;
+        console.log(`=== The ${opponent.name} died! ===`);
+    }
+    // check if pet has died, and remove it if it has
+    if (player.pet && player.pet.health <= 0) {
+        let pet = player.pet;
+        player.pet = null;
+        console.log(`=== The ${pet.name} died! ===`);
+        // give player the loot
+        if (pet.loot && pet.loot.length) {
+            for (let loot in pet.loot) {
+                let quantity = helpers.randomInt(...pet.loot[loot]);
+                if (helpers.giveItem()) {
+                    
+                }
+            }
+        }
     }
     if (player.hunger <= 0) {
         console.log('You starved to death');
