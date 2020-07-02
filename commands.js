@@ -8,12 +8,8 @@ const process = require('process');
 const give = function (player, args) {
     let itemName = helpers.multiWordArg(args);
     if (allItems[itemName]) {
-        if (helpers.giveItem(player, allItems, itemName)) {
-            return helpers.Status.SUCCESS;
-        } else {
-            console.error('Your inventory is full.');
-            return helpers.Status.NO_ACTION;
-        }
+        const result = helpers.giveItem(player, { [itemName]: 1 });
+        return result ? helpers.Status.SUCCESS : helpers.Status.NO_ACTION;
     } else {
         console.error(`Unrecognized item name ${itemName}`);
         return helpers.Status.NO_ACTION;
@@ -45,9 +41,10 @@ const craft = function (player, args) {
     }
     let item = allItems[itemName];
     // only allow already discovered items with ingredients list to be crafted 
-    if (item && item.ingredients && item.discovered) {
+    if (item && item.ingredients && player.discoveredItems[itemName]) {
         let success = helpers.removeItems(player.inventory, item.ingredients);
         if (success) {
+            //TODO: update to use giveItem
             player.inventory.push({ name: itemName });
             console.log(`You crafted a ${itemName}!`);
             return helpers.Status.SUCCESS;
@@ -114,16 +111,12 @@ const inventory = function (player) {
 };
 
 const rummage = function (player) {
-    if (player.inventory.length === player.maxInventorySlots) {
-        console.error('Your inventory is full! Please drop something first.');
-        return helpers.Status.NO_ACTION;
-    }
     const randItem = helpers.randomItem();
     player.hunger -= helpers.randomInt(3, 5);
     if (randItem === 'Nothing') {
         console.log('You didn\'t pick up anything!');
     } else {
-        helpers.giveItem(player, allItems, randItem);
+        helpers.giveItem(player, { [randItem]: 1 });
     }
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };

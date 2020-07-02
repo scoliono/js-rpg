@@ -13,7 +13,8 @@ var player = {
     opponent: null,
     pet: null,
     shield: null,
-    maxInventorySlots: 10
+    maxInventorySlots: 10,
+    discoveredItems: {}     // { "Shovel": true, "Stick": true }
 };
 
 // ask for player name
@@ -60,17 +61,18 @@ function checkDeath()
     }
     // check if pet has died, and remove it if it has
     if (player.pet && player.pet.health <= 0) {
-        let pet = player.pet;
+        const pet = player.pet;
         player.pet = null;
         console.log(`=== The ${pet.name} died! ===`);
         // give player the loot
-        if (pet.loot && pet.loot.length) {
+        if (pet.loot && Object.keys(pet.loot).length) {
+            let itemList = {};
+            // sets up itemList like so: {"Leather": 4, "Wool": 2}
             for (let loot in pet.loot) {
                 let quantity = helpers.randomInt(...pet.loot[loot]);
-                if (helpers.giveItem()) {
-                    
-                }
+                itemList[loot] = quantity;
             }
+            helpers.giveItem(player, itemList);
         }
     }
     if (player.hunger <= 0) {

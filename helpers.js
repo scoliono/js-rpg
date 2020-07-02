@@ -1,5 +1,5 @@
-var allItems = require('./items.json');
-var allAnimals = require('./animals.json');
+const allItems = require('./items.json');
+const allAnimals = require('./animals.json');
 
 /**
  * Generates a random integer between min and max.
@@ -62,22 +62,30 @@ const findItem = (inventory, item) => {
  * @param Object itemList  An object with the key being the item's name, and the value being the quantity to add.
  * @returns Boolean
  */
-const giveItem = (player, items, itemList) => {
-    // preliminary check that player has enough inv slots
-    const total = Object.values(itemList).reduce((t, q) => t + q, 0);
+const giveItem = (player, itemList) => {
+    // preliminary check that player has enough inv slots.
+    let total = 0;
+    for (let itemName in itemList) {
+        // hidden items don't count against your total slots,
+        // but we'll revisit them later
+        if (!allItems[itemName].hidden) {
+            total += itemList[itemName];
+        }
+    }
     if (player.inventory.length + total > player.maxInventorySlots) {
         //TODO: prompt user to drop something
+        console.error('You don\'t have room to pick this up.');
         return false;
     }
     let strList = [];
     for (let itemName in itemList) {
-        const item = items[itemName];
+        const item = allItems[itemName];
         const quantity = itemList[itemName];
         if (itemName === 'Backpack') {
             player.maxInventorySlots += 30 * quantity;
             console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
         }
-        items[itemName].discovered = true;
+        player.discoveredItems[itemName] = true;
         strList.push(`${quantity}x ${itemName}`);
         // don't add hidden items to inv
         if (item.hidden) continue;

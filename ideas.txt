@@ -1,5 +1,5 @@
-WIP - new giveItem logic
-Friendly animals
+giveItem keep/drop menu when inv is full
+Save files
 Daylight cycle
 Recall commands with up/down arrow keys
 Disease/poison (considered)
