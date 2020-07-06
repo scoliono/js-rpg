@@ -1,3 +1,4 @@
+const readline = require('readline-sync');
 const allItems = require('./items.json');
 const allAnimals = require('./animals.json');
 
@@ -64,18 +65,47 @@ const findItem = (inventory, item) => {
  */
 const giveItem = (player, itemList) => {
     // preliminary check that player has enough inv slots.
-    let total = 0;
+    let flattened = [];
     for (let itemName in itemList) {
         // hidden items don't count against your total slots,
         // but we'll revisit them later
         if (!allItems[itemName].hidden) {
-            total += itemList[itemName];
+            for (let i = 0; i < itemList[itemName]; i++)
+                flattened.push(itemName);
         }
     }
-    if (player.inventory.length + total > player.maxInventorySlots) {
-        //TODO: prompt user to drop something
-        console.error('You don\'t have room to pick this up.');
-        return false;
+    if (player.inventory.length + flattened.length > player.maxInventorySlots) {
+        let newInv = [...player.inventory];
+        let menuItems;
+        while (true) {
+            menuItems = flattened.concat(newInv.map(i => i.name));
+            let canExit = menuItems.length <= player.maxInventorySlots;
+            if (canExit) {
+                menuItems.push('DONE');
+            }
+            const result = readline.keyInSelect(menuItems, 'Choose which item to discard:');
+            if (result === -1) {
+                // cancel
+                return false;
+            } else if (canExit && result === menuItems.length - 1) {
+                // done
+                break;
+            } else if (result < flattened.length) {
+                // they want to discard one of the "new items"
+                flattened.splice(result, 1);
+            } else {
+                // they want to discard an item they already have
+                newInv.splice(result - flattened.length, 1);
+            }
+        }
+        // update player.inventory to reflect deletion of any items they already had
+        player.inventory = newInv;
+        // update itemList to reflect changes to flattened
+        let newItemList = {};
+        for (let name of flattened) {
+            newItemList[name]++;
+        }
+        itemList = newItemList;
     }
     let strList = [];
     for (let itemName in itemList) {
