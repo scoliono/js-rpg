@@ -40,8 +40,11 @@ const craft = function (player, args) {
         return helpers.Status.NO_ACTION;
     }
     let item = allItems[itemName];
-    // only allow already discovered items with ingredients list to be crafted 
-    if (item && item.ingredients && player.discoveredItems[itemName]) {
+    // only allow already discovered items with ingredients list to be crafted
+    // items with rarity = 0 do not need to be discovered first, since they can't
+    const itemHasRecipe = item && item.ingredients;
+    const playerKnowsRecipe = player.discoveredItems[itemName] || item.rarity === 0;
+    if (itemHasRecipe && playerKnowsRecipe) {
         let success = helpers.removeItems(player.inventory, item.ingredients);
         if (success) {
             //TODO: update to use giveItem
