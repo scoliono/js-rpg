@@ -103,30 +103,31 @@ const giveItem = (player, itemList) => {
         // update itemList to reflect changes to flattened
         let newItemList = {};
         for (let name of flattened) {
-            newItemList[name]++;
+            newItemList[name] = newItemList[name] ? newItemList[name] + 1 : 1;
         }
         itemList = newItemList;
     }
     let strList = [];
-    for (let itemName in itemList) {
-        const item = allItems[itemName];
+    // format as ["3x Stick", "1x Rock"] etc.
+    for (const itemName in itemList) {
         const quantity = itemList[itemName];
+        strList.push(`${quantity}x ${itemName}`);
+    }
+    // Add each item to the inventory
+    for (let itemName of flattened) {
+        const item = allItems[itemName];
         if (itemName === 'Backpack') {
-            player.maxInventorySlots += 30 * quantity;
+            player.maxInventorySlots += 30;
             console.log(`Your inventory can now hold ${player.maxInventorySlots} items.`);
         }
         player.discoveredItems[itemName] = true;
-        strList.push(`${quantity}x ${itemName}`);
         // don't add hidden items to inv
         if (item.hidden) continue;
-        // adds appropriate quantity of that item
-        for (let i = 0; i < quantity; i++) {
-            player.inventory.push({
-                name: itemName,
-                durability: +item.durability,
-                maxDurability: +item.durability
-            });
-        }
+        player.inventory.push({
+            name: itemName,
+            durability: +item.durability,
+            maxDurability: +item.durability
+        });
     }
     console.log(`You picked up: ${strList.join(', ')}!`);
     return true;
