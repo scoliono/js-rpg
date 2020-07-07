@@ -1,7 +1,7 @@
 const readline = require('readline-sync');
 const commands = require('./commands.js');
 const helpers = require('./helpers.js');
-const config = require('./config.json');
+const config = require('./settings.json');
 
 
 // player state

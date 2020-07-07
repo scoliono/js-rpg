@@ -1,7 +1,7 @@
 var allItems = require('./items.json');
 var allAnimals = require('./animals.json');
 
-const config = require('./config.json');
+const config = require('./settings.json');
 const helpers = require('./helpers.js');
 const process = require('process');
 
