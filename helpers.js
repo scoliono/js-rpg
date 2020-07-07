@@ -187,6 +187,12 @@ const randomPet = () => randomChoice(allAnimals.filter(a => a.friendly));
 const multiWordArg = (args, index = 1) => args.slice(index).join(' ');
 
 /**
+ * Generates a timestamp-based save file name, as a suitable default
+ * for if the player provides none.
+ */
+const genSaveFileName = () => new Date().toJSON().replace('T', '_').slice(0, -1);
+
+/**
  * A list of all status codes that a command can return.
  */
 const Status = {

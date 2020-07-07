@@ -3,7 +3,10 @@ var allAnimals = require('./animals.json');
 
 const config = require('./settings.json');
 const helpers = require('./helpers.js');
+
 const process = require('process');
+const fs = require('fs');
+const readline = require('readline-sync');
 
 const give = function (player, args) {
     let itemName = helpers.multiWordArg(args);
@@ -267,8 +270,32 @@ const quit = function () {
     return helpers.Status.NO_ACTION;
 };
 
+const save = function (player, args) {
+    const filename = args[1]
+        || readline.question('Enter a save file name: ')
+        || helpers.genSaveFileName();
+    try {
+        fs.writeFileSync(
+            `./saves/${filename}.json`,
+            JSON.stringify(player)
+        );
+        console.log('Saved file successfully!');
+    } catch (err) {
+        console.error('There was an error saving the file. Make sure the name is properly formatted and try again.');
+    } finally {
+        return helpers.Status.NO_ACTION;
+    }
+};
+
+const load = function (player, args) {
+    const filename = args[1]
+        || readline.question('Enter a save file name: ')
+        || helpers.genSaveFileName();
+};
+
 module.exports = {
     craft, eat, heal, walk, run, attack,
     inventory, rummage, drop, equip, unequip,
-    clear, help, quit, give, spawn
+    clear, help, quit, save, load,
+    give, spawn
 };
