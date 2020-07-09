@@ -1,6 +1,7 @@
 const readline = require('readline-sync');
 const allItems = require('./items.json');
 const allAnimals = require('./animals.json');
+const fs = require('fs');
 
 /**
  * Generates a random integer between min and max.
@@ -189,8 +190,36 @@ const multiWordArg = (args, index = 1) => args.slice(index).join(' ');
 /**
  * Generates a timestamp-based save file name, as a suitable default
  * for if the player provides none.
+ * @return String
  */
 const genSaveFileName = () => new Date().toJSON().replace('T', '_').slice(0, -1);
+
+/**
+ * Reads a filename from args[1] if it exists.
+ * Otherwise, prompts the user to pick a file from `dir` with the extension `ext`.
+ * Returns the filename with the extension included.
+ * @param Array args
+ * @param String dir
+ * @param String ext
+ * @returns String
+ */
+const filePicker = (args, dir, ext) => {
+    var filename = args[1];
+    if (!filename) {
+        const files = fs.readdirSync(dir)
+                        .filter(file => file.endsWith(ext))
+                        .map(file => file.slice(0, -ext.length));
+        const i = readline.keyInSelect(files, 'Select a save file:');
+        if (i === -1) {
+            return null;
+        }
+        filename = files[i];
+    }
+    filename = filename.endsWith(ext) ?
+               filename :
+               `${filename}${ext}`;
+    return filename;
+};
 
 /**
  * A list of all status codes that a command can return.
@@ -201,6 +230,8 @@ const Status = {
     MOVED: 2
 };
 
+const saveFileExt = '.json';
+
 const Cheats = ['give', 'spawn'];
 
 module.exports = {
@@ -209,6 +240,9 @@ module.exports = {
     countItem,
     findItem,
     giveItem,
+    genSaveFileName,
+    filePicker,
+    saveFileExt,
     multiWordArg,
     findAnimal,
     removeItems,

@@ -24,10 +24,12 @@ const spawn = function (player, args) {
     let animal = helpers.findAnimal(animalName);
     if (animal) {
         if (animal.friendly) {
-            player.pet = Object.create(animal);
+            player.pet = {};
+            Object.assign(player.pet, animal);
             return helpers.Status.SUCCESS;
         } else {
-            player.opponent = Object.create(animal);
+            player.opponent = {};
+            Object.assign(player.opponent, animal);
             return helpers.Status.SUCCESS;
         }
     } else {
@@ -271,12 +273,13 @@ const quit = function () {
 };
 
 const save = function (player, args) {
-    const filename = args[1]
-        || readline.question('Enter a save file name: ')
-        || helpers.genSaveFileName();
+    const filename = helpers.filePicker(args, './saves', helpers.saveFileExt);
+    if (filename === null) {
+        return helpers.Status.NO_ACTION;
+    }
     try {
         fs.writeFileSync(
-            `./saves/${filename}.json`,
+            `./saves/${filename}`,
             JSON.stringify(player)
         );
         console.log('Saved file successfully!');
@@ -288,9 +291,18 @@ const save = function (player, args) {
 };
 
 const load = function (player, args) {
-    const filename = args[1]
-        || readline.question('Enter a save file name: ')
-        || helpers.genSaveFileName();
+    const filename = helpers.filePicker(args, './saves', helpers.saveFileExt);   if (filename === null) {
+        return helpers.Status.NO_ACTION;
+    }
+    try {
+        const saveData = fs.readFileSync(`./saves/${filename}`);
+        Object.assign(player, JSON.parse(saveData));
+        console.log('Loaded file successfully!');
+    } catch (err) {
+        console.error('There was an error loading the file. Make sure the name is properly formatted and try again.');
+    } finally {
+        return helpers.Status.NO_ACTION;
+    }
 };
 
 module.exports = {

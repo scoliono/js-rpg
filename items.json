@@ -64,7 +64,8 @@
     "Camo Cloak": {
         "rarity": 2,
         "equippable": true,
-        "durability": "Infinity"
+        "durability": "Infinity",
+        "maxDurability": "Infinity"
     },
     "Backpack": {
         "rarity": 10,

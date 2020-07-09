@@ -98,7 +98,8 @@ function doPetTurn()
         let findPet = helpers.randomInt(1, hasFood ? 10 : 15) === 1;
         if (findPet) {
             let pet = helpers.randomPet();
-            player.pet = Object.create(pet);
+            player.pet = {};
+            Object.assign(player.pet, pet);
             console.log(`=== You encountered a friendly ${pet.name}!  ===`);
             console.log(`=== ${pet.description} ===`);
         }
@@ -121,7 +122,8 @@ function doCombatTurn()
         let findEnemy = helpers.randomInt(1, hasCloak ? 90 : 30) === 1;
         if (findEnemy) {
             let enemy = helpers.randomEnemy();
-            player.opponent = Object.create(enemy);
+            player.opponent = {};
+            Object.assign(player.opponent, enemy);
             console.log(`=== You encountered an enemy ${enemy.name}!  ===`);
             console.log(`=== ${enemy.description} ===`);
         }
