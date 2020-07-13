@@ -37,7 +37,7 @@ function printStatus()
     }
     if (player.shield) {
         let durabilityStr;
-        if (player.shield.maxDurability === Infinity) {
+        if (player.shield.unbreakable) {
             durabilityStr = ' (unbreakable)';
         } else {
             durabilityStr = `: ${player.shield.durability}/${player.shield.maxDurability} durability`;
@@ -134,7 +134,7 @@ function doCombatTurn()
         console.log(`=== The ${player.opponent.name} ${randMove}, doing ${dmg} HP of damage! ===`);
         // if player is equipping something without infinite durability,
         // have it absorb roughly half the damage
-        if (player.shield && player.shield.maxDurability !== Infinity) {
+        if (player.shield && !player.shield.unbreakable) {
             let maxDmgAbsorbed = Math.ceil(dmg / 2);
             let actualDmgAbsorbed = Math.min(player.shield.durability, maxDmgAbsorbed);
             player.shield.durability -= actualDmgAbsorbed;

@@ -228,7 +228,7 @@ const equip = function (player, args) {
     if (result) {
         player.shield = result[0];
         let durabilityStr;
-        if (player.shield.maxDurability === Infinity) {
+        if (player.shield.unbreakable) {
             durabilityStr = 'Unbreakable';
         } else {
             durabilityStr = `${result[0].durability}/${result[0].maxDurability}`;
@@ -280,7 +280,7 @@ const save = function (player, args) {
     try {
         fs.writeFileSync(
             `./saves/${filename}`,
-            JSON.stringify(player)
+            Buffer.from(JSON.stringify(player), 'utf8').toString('hex')
         );
         console.log('Saved file successfully!');
     } catch (err) {
@@ -296,7 +296,9 @@ const load = function (player, args) {
     }
     try {
         const saveData = fs.readFileSync(`./saves/${filename}`);
-        Object.assign(player, JSON.parse(saveData));
+        Object.assign(player, JSON.parse(
+            Buffer.from(saveData, 'base64').toString('hex')
+        ));
         console.log('Loaded file successfully!');
     } catch (err) {
         console.error('There was an error loading the file. Make sure the name is properly formatted and try again.');

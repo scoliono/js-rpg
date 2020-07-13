@@ -127,7 +127,8 @@ const giveItem = (player, itemList) => {
         player.inventory.push({
             name: itemName,
             durability: +item.durability,
-            maxDurability: +item.durability
+            maxDurability: +item.durability,
+            unbreakable: item.unbreakable,
         });
     }
     console.log(`You picked up: ${strList.join(', ')}!`);
@@ -209,11 +210,15 @@ const filePicker = (args, dir, ext) => {
         const files = fs.readdirSync(dir)
                         .filter(file => file.endsWith(ext))
                         .map(file => file.slice(0, -ext.length));
-        const i = readline.keyInSelect(files, 'Select a save file:');
-        if (i === -1) {
-            return null;
+        if (!files.length) {
+            filename = readline.question('Enter a save file name: ');
+        } else {
+            const i = readline.keyInSelect(files, 'Select a save file');
+            if (i === -1) {
+                return null;
+            }
+            filename = files[i];
         }
-        filename = files[i];
     }
     filename = filename.endsWith(ext) ?
                filename :
@@ -230,7 +235,7 @@ const Status = {
     MOVED: 2
 };
 
-const saveFileExt = '.json';
+const saveFileExt = '.dat';
 
 const Cheats = ['give', 'spawn'];
 

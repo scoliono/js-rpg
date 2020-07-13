@@ -1,4 +1,4 @@
-Save file bug: infinity strength shields
+Save file bug: enemy persists when loading
 Daylight cycle
 Recall commands with up/down arrow keys
 Disease/poison (considered)
