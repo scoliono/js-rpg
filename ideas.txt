@@ -1,6 +1,6 @@
 Save file bug: enemy persists when loading
+PvP mode / multiplayer (hard)
 Daylight cycle
 Recall commands with up/down arrow keys
 Disease/poison (considered)
 Thirst meter (possibly)
-PvP mode / multiplayer (hard)

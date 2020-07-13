@@ -2,7 +2,9 @@ const readline = require('readline-sync');
 const commands = require('./commands.js');
 const helpers = require('./helpers.js');
 const config = require('./settings.json');
+const { fork } = require('child_process');
 
+const server = fork('./server.js');
 
 // player state
 var player = {
