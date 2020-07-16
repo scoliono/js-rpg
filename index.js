@@ -2,9 +2,20 @@ const readline = require('readline-sync');
 const commands = require('./commands.js');
 const helpers = require('./helpers.js');
 const config = require('./settings.json');
+const io = require('socket.io-client');
 const { fork } = require('child_process');
-
 const server = fork('./server.js');
+
+server.on('message', msg => {
+    console.log(msg);
+    // only connect once server is ready
+    if (msg.status === 'ready') {
+        const socket = io(`https://js-rpg.scoliono.repl.co`);
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+    }
+});
 
 // player state
 var player = {

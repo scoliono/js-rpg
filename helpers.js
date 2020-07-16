@@ -109,13 +109,8 @@ const giveItem = (player, itemList) => {
         itemList = newItemList;
     }
     let strList = [];
-    // format as ["3x Stick", "1x Rock"] etc.
-    for (const itemName in itemList) {
-        const quantity = itemList[itemName];
-        strList.push(`${quantity}x ${itemName}`);
-    }
     // Add each item to the inventory
-    for (let itemName of flattened) {
+    for (let itemName in itemList) {
         const item = allItems[itemName];
         if (itemName === 'Backpack') {
             player.maxInventorySlots += 30;
@@ -124,14 +119,21 @@ const giveItem = (player, itemList) => {
         player.discoveredItems[itemName] = true;
         // don't add hidden items to inv
         if (item.hidden) continue;
-        player.inventory.push({
-            name: itemName,
-            durability: +item.durability,
-            maxDurability: +item.durability,
-            unbreakable: item.unbreakable,
-        });
+        // format as ["3x Stick", "1x Rock"] etc.
+        const quantity = itemList[itemName];
+        strList.push(`${quantity}x ${itemName}`);
+        for (let i = 0; i < quantity; i++) {
+            player.inventory.push({
+                name: itemName,
+                durability: +item.durability,
+                maxDurability: +item.durability,
+                unbreakable: item.unbreakable,
+            });
+        }
     }
-    console.log(`You picked up: ${strList.join(', ')}!`);
+    if (strList.length) {
+        console.log(`You picked up: ${strList.join(', ')}!`);
+    }
     return true;
 };
 
@@ -193,7 +195,7 @@ const multiWordArg = (args, index = 1) => args.slice(index).join(' ');
  * for if the player provides none.
  * @return String
  */
-const genSaveFileName = () => new Date().toJSON().replace('T', '_').slice(0, -1);
+const genSaveFileName = () => new Date().toJSON().replace('T', '_').replace(/[:\.]/g, '-').slice(0, -1);
 
 /**
  * Reads a filename from args[1] if it exists.
