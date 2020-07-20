@@ -1,4 +1,3 @@
-const readline = require('readline-sync');
 const allItems = require('./items.json');
 const allAnimals = require('./animals.json');
 const fs = require('fs');
@@ -58,13 +57,49 @@ const findItem = (inventory, item) => {
 };
 
 /**
+ * Displays a menu prompt.
+ * @param rl  The readline interface.
+ * @param String prompt  The question to respond to.
+ * @param Array options  The list of choices the user is presented with.
+ * @returns Number  The index of the selected option.
+ */
+const menuSelect = async (rl, options, prompt) => {
+    for (let i = 0; i < options.length; i++) {
+        console.log(`[${i + 1}] ${options[i]}`);
+    }
+    console.log(`[${options.length + 1}] CANCEL`);
+    while (true) {
+        const choice = +(await question(rl, prompt));
+        if (choice === options.length + 1) {
+            return -1;
+        } else if (Number.isInteger(choice) && choice >= 1 && choice <= options.length) {
+            return choice - 1;
+        } else {
+            console.log(`Please type a number from 1 to ${options.length + 1}.`);
+        }
+    }
+};
+
+/**
+ * Version of readline.question() that returns a Promise.
+ * @param rl  The readline interface.
+ * @param String prompt  The question to respond to.
+ * @returns Promise
+ */
+const question = (rl, prompt) => {
+    return new Promise((resolve, reject) => {
+        rl.question(prompt, resolve);
+    });
+};
+
+/**
  * Gives an item to the player and runs additional logic if needed.
  * @param Object player
  * @param Object items  The items database.
  * @param Object itemList  An object with the key being the item's name, and the value being the quantity to add.
  * @returns Boolean
  */
-const giveItem = (player, itemList) => {
+const giveItem = async (player, itemList, rl) => {
     // preliminary check that player has enough inv slots.
     let flattened = [];
     for (let itemName in itemList) {
@@ -84,7 +119,7 @@ const giveItem = (player, itemList) => {
             if (canExit) {
                 menuItems.push('DONE');
             }
-            const result = readline.keyInSelect(menuItems, 'Choose which item to discard:');
+            const result = await menuSelect(rl, menuItems, 'Choose which item to discard: ');
             if (result === -1) {
                 // cancel
                 return false;
@@ -206,16 +241,16 @@ const genSaveFileName = () => new Date().toJSON().replace('T', '_').replace(/[:\
  * @param String ext
  * @returns String
  */
-const filePicker = (args, dir, ext) => {
+const filePicker = async (args, dir, ext, rl) => {
     var filename = args[1];
     if (!filename) {
         const files = fs.readdirSync(dir)
                         .filter(file => file.endsWith(ext))
                         .map(file => file.slice(0, -ext.length));
         if (!files.length) {
-            filename = readline.question('Enter a save file name: ');
+            filename = await question(rl, 'Enter a save file name: ');
         } else {
-            const i = readline.keyInSelect(files, 'Select a save file');
+            const i = await menuSelect(rl, files, 'Select a save file: ');
             if (i === -1) {
                 return null;
             }
@@ -250,6 +285,8 @@ module.exports = {
     genSaveFileName,
     filePicker,
     saveFileExt,
+    question,
+    menuSelect,
     multiWordArg,
     findAnimal,
     removeItems,

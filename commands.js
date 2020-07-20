@@ -4,14 +4,12 @@ var allAnimals = require('./animals.json');
 const config = require('./settings.json');
 const helpers = require('./helpers.js');
 
-const process = require('process');
 const fs = require('fs');
-const readline = require('readline-sync');
 
-const give = function (player, args) {
+const give = async function (player, args, rl) {
     let itemName = helpers.multiWordArg(args);
     if (allItems[itemName]) {
-        const result = helpers.giveItem(player, { [itemName]: 1 });
+        const result = await helpers.giveItem(player, { [itemName]: 1 }, rl);
         return result ? helpers.Status.SUCCESS : helpers.Status.NO_ACTION;
     } else {
         console.error(`Unrecognized item name ${itemName}`);
@@ -19,7 +17,7 @@ const give = function (player, args) {
     }
 };
 
-const spawn = function (player, args) {
+const spawn = async function (player, args) {
     let animalName = helpers.multiWordArg(args);
     let animal = helpers.findAnimal(animalName);
     if (animal) {
@@ -38,7 +36,7 @@ const spawn = function (player, args) {
     }
 };
 
-const craft = function (player, args) {
+const craft = async function (player, args, rl) {
     let itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to craft.');
@@ -52,8 +50,7 @@ const craft = function (player, args) {
     if (itemHasRecipe && playerKnowsRecipe) {
         let success = helpers.removeItems(player.inventory, item.ingredients);
         if (success) {
-            //TODO: update to use giveItem
-            player.inventory.push({ name: itemName });
+            await helpers.giveItem(player, { [itemName]: 1 }, rl);
             console.log(`You crafted a ${itemName}!`);
             return helpers.Status.SUCCESS;
         } else {
@@ -70,7 +67,7 @@ const craft = function (player, args) {
     }
 };
 
-const eat = function (player, args) {
+const eat = async function (player, args) {
     if (player.hunger < 100) {
         let success = helpers.removeItems(player.inventory, {'Rations': 1});
         if (success) {
@@ -87,23 +84,21 @@ const eat = function (player, args) {
     }
 };
 
-const walk = function (player, args) {
+const walk = async function (player, args) {
     const place = helpers.multiWordArg(args) || 'middle of nowhere';
     console.log(`You walk to the ${place}.`);
     player.hunger -= helpers.randomInt(1, 5);
-    player.justMoved = true;
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };
 
-const run = function (player, args) {
+const run = async function (player, args) {
     const place = helpers.multiWordArg(args) || 'middle of nowhere';
     console.log(`You run to the ${place}.`);
     player.hunger -= helpers.randomInt(3, 10);
-    player.justMoved = true;
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };
 
-const inventory = function (player) {
+const inventory = async function (player) {
     console.log(`${player.inventory.length}/${player.maxInventorySlots} items full`);
     if (player.inventory.length === 0) {
         console.log('You have nothing!');
@@ -118,18 +113,18 @@ const inventory = function (player) {
     return helpers.Status.NO_ACTION;
 };
 
-const rummage = function (player) {
+const rummage = async function (player, args, rl) {
     const randItem = helpers.randomItem();
     player.hunger -= helpers.randomInt(3, 5);
     if (randItem === 'Nothing') {
         console.log('You didn\'t pick up anything!');
     } else {
-        helpers.giveItem(player, { [randItem]: 1 });
+        await helpers.giveItem(player, { [randItem]: 1 }, rl);
     }
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };
 
-const attack = function (player, args) {
+const attack = async function (player, args) {
     let target;
     switch (args[1]) {
         case 'enemy':
@@ -181,7 +176,7 @@ const attack = function (player, args) {
     return helpers.Status.SUCCESS;
 };
 
-const heal = function (player, args) {
+const heal = async function (player, args) {
     const result = helpers.removeItems(player.inventory, {
         Bandage: 1
     });
@@ -196,7 +191,7 @@ const heal = function (player, args) {
     }
 };
 
-const drop = function (player, args) {
+const drop = async function (player, args) {
     const itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to drop.');
@@ -214,7 +209,7 @@ const drop = function (player, args) {
     }
 };
 
-const equip = function (player, args) {
+const equip = async function (player, args) {
     const itemName = helpers.multiWordArg(args);
     if (!allItems[itemName].equippable) {
         console.error('You cannot equip that.');
@@ -241,7 +236,7 @@ const equip = function (player, args) {
     }
 };
 
-const unequip = function (player, args) {
+const unequip = async function (player, args) {
     if (player.inventory.length === player.maxInventorySlots) {
         console.error('You need to get rid of something before unequipping.');
         return helpers.Status.NO_ACTION;
@@ -253,12 +248,12 @@ const unequip = function (player, args) {
     return helpers.Status.SUCCESS;
 };
 
-const clear = function () {
+const clear = async function () {
     console.clear();
     return helpers.Status.NO_ACTION;
 };
 
-const help = function () {
+const help = async function () {
     let cmds = Object.keys(module.exports);
     if (!config.dev) {
         cmds = cmds.filter(cmd => !helpers.Cheats.includes(cmd));
@@ -267,13 +262,13 @@ const help = function () {
     return helpers.Status.NO_ACTION;
 };
 
-const quit = function () {
+const quit = async function () {
     process.exit(0);
     return helpers.Status.NO_ACTION;
 };
 
-const save = function (player, args) {
-    const filename = helpers.filePicker(args, './saves', helpers.saveFileExt);
+const save = async function (player, args, rl) {
+    const filename = await helpers.filePicker(args, './saves', helpers.saveFileExt, rl);
     if (filename === null) {
         return helpers.Status.NO_ACTION;
     }
@@ -290,8 +285,9 @@ const save = function (player, args) {
     }
 };
 
-const load = function (player, args) {
-    const filename = helpers.filePicker(args, './saves', helpers.saveFileExt);   if (filename === null) {
+const load = async function (player, args, rl) {
+    const filename = await helpers.filePicker(args, './saves', helpers.saveFileExt, rl);
+    if (filename === null) {
         return helpers.Status.NO_ACTION;
     }
     try {

@@ -13,8 +13,8 @@ function log(message, severity = 'INFO')
 }
 
 io.listen(config.port);
-process.send({ status: 'ready' });
 log(`Started the server on port ${config.port}`);
+process.send({ status: 'ready' });
 
 io.on('connect', socket => {
     log('New connection');

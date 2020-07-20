@@ -1,4 +1,4 @@
-const readline = require('readline-sync');
+const readline = require('readline');
 const commands = require('./commands.js');
 const helpers = require('./helpers.js');
 const config = require('./settings.json');
@@ -17,6 +17,11 @@ server.on('message', msg => {
     }
 });
 
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
 // player state
 var player = {
     hunger: 100,
@@ -29,11 +34,6 @@ var player = {
     maxInventorySlots: 10,
     discoveredItems: {}     // { "Shovel": true, "Stick": true }
 };
-
-// ask for player name
-player.name = readline.question('What\'s your name? ');
-console.log(`Hello, ${player.name}!`);
-
 
 /**
  * Prints out the status of the player and opponent, if there is one. Should run every turn.
@@ -64,7 +64,7 @@ function printStatus()
  * Checks whether the player (or opponent, if there is one) has died. Should print out a death message.
  * @returns bool
  */
-function checkDeath()
+async function checkDeath()
 {
     // check if opponent has died, and remove it if it has
     if (player.opponent && player.opponent.health <= 0) {
@@ -85,7 +85,7 @@ function checkDeath()
                 let quantity = helpers.randomInt(...pet.loot[loot]);
                 itemList[loot] = quantity;
             }
-            helpers.giveItem(player, itemList);
+            await helpers.giveItem(player, itemList, rl);
         }
     }
     if (player.hunger <= 0) {
@@ -164,28 +164,36 @@ function doCombatTurn()
 
 
 // main game loop
-var gameOver = false;
-var lastCommand = 0;
-while (!gameOver) {
-    printStatus();
-    const args = readline.question('> ').split(' ');
-    const command = args[0].toLowerCase();
-    if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
-        lastCommand = commands[command](player, args);
-    } else {
-        lastCommand = helpers.Status.NO_ACTION;
-        console.error('That action is invalid!');
-    }
-    // if last command did not fail, regardless of combat status
-    if (lastCommand & helpers.Status.SUCCESS) {
-        // check if the player moved in the last turn
-        // OR they are currently in combat
-        if ((lastCommand & helpers.Status.MOVED) || player.opponent) {
-            doCombatTurn();
-            doPetTurn();
+async function gameLoop()
+{
+    // ask for player name
+    player.name = await helpers.question(rl, 'What\'s your name? ');
+    console.log(`Hello, ${player.name}!`);
+    var gameOver = false;
+    var lastCommand = 0;
+    while (!gameOver) {
+        printStatus();
+        const answer = await helpers.question(rl, '> ');
+        const args = answer.split(' ');
+        const command = args[0].toLowerCase();
+        if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
+            lastCommand = await commands[command](player, args, rl);
+        } else {
+            lastCommand = helpers.Status.NO_ACTION;
+            console.error('That action is invalid!');
         }
+        // if last command did not fail, regardless of combat status
+        if (lastCommand & helpers.Status.SUCCESS) {
+            // check if the player moved in the last turn
+            // OR they are currently in combat
+            if ((lastCommand & helpers.Status.MOVED) || player.opponent) {
+                doCombatTurn();
+                doPetTurn();
+            }
+        }
+        gameOver = await checkDeath();
     }
-    gameOver = checkDeath();
-}
 
-console.log('Game Over!');
+    console.log('Game Over!');
+}
+gameLoop();
