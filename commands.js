@@ -5,6 +5,7 @@ const config = require('./settings.json');
 const helpers = require('./helpers.js');
 
 const fs = require('fs');
+const util = require('util');
 
 const give = async function (player, args, rl) {
     let itemName = helpers.multiWordArg(args);
@@ -273,7 +274,8 @@ const save = async function (player, args, rl) {
         return helpers.Status.NO_ACTION;
     }
     try {
-        fs.writeFileSync(
+        const writeFile = util.promisify(fs.writeFile);
+        await writeFile(
             `./saves/${filename}`,
             Buffer.from(JSON.stringify(player), 'utf8').toString('hex')
         );
@@ -291,7 +293,8 @@ const load = async function (player, args, rl) {
         return helpers.Status.NO_ACTION;
     }
     try {
-        const saveData = fs.readFileSync(`./saves/${filename}`);
+        const readFile = util.promisify(fs.readFile);
+        const saveData = await readFile(`./saves/${filename}`);
         Object.assign(player, JSON.parse(
             Buffer.from(saveData, 'base64').toString('hex')
         ));
@@ -303,9 +306,18 @@ const load = async function (player, args, rl) {
     }
 };
 
+const clearlogs = async function () {
+    const readdir = util.promisify(fs.readdir);
+    const unlink = util.promisify(fs.unlink);
+    const fileList = (await readdir('./logs')).filter(f => f.endsWith('.log'));
+    fileList.forEach(async (f) => {
+        await unlink(`./logs/${f}`);
+    });
+};
+
 module.exports = {
     craft, eat, heal, walk, run, attack,
     inventory, rummage, drop, equip, unequip,
     clear, help, quit, save, load,
-    give, spawn
+    give, spawn, clearlogs
 };

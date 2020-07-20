@@ -1,6 +1,7 @@
 const allItems = require('./items.json');
 const allAnimals = require('./animals.json');
 const fs = require('fs');
+const util = require('util');
 
 /**
  * Generates a random integer between min and max.
@@ -244,9 +245,10 @@ const genSaveFileName = () => new Date().toJSON().replace('T', '_').replace(/[:\
 const filePicker = async (args, dir, ext, rl) => {
     var filename = args[1];
     if (!filename) {
-        const files = fs.readdirSync(dir)
-                        .filter(file => file.endsWith(ext))
-                        .map(file => file.slice(0, -ext.length));
+        const readdir = util.promisify(fs.readdir);
+        const files = await readdir(dir)
+                            .filter(file => file.endsWith(ext))
+                            .map(file => file.slice(0, -ext.length));
         if (!files.length) {
             filename = await question(rl, 'Enter a save file name: ');
         } else {
