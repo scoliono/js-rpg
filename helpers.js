@@ -4,6 +4,33 @@ const fs = require('fs');
 const util = require('util');
 
 /**
+ * Initializes a new Player object.
+ * @returns Object
+ */
+const initPlayer = () => ({
+    hunger: 100,
+    health: 100,
+    inventory: [],
+    // [ {name: "Shovel", life: 0.5}, {name: "Shovel", life: 0.75}, {name: "Rock"} ]
+    opponent: null,
+    pet: null,
+    shield: null,
+    maxInventorySlots: 10,
+    discoveredItems: {}     // { "Shovel": true, "Stick": true }
+});
+
+/**
+ * Logs a new message.
+ * @param WriteStream stream  The file stream to write to.
+ * @param String message  The log message.
+ * @param String [severity='INFO']  The severity of the message.
+ */
+const log = (stream, message, severity = 'INFO') => {
+    let timestamp = new Date().toJSON().replace('T', ' ').slice(0, -1);
+    stream.write(`[${timestamp}] ${severity.toUpperCase()}: ${message}\n`);
+};
+
+/**
  * Generates a random integer between min and max.
  * @param Number min  The lowest number in the range
  * @param Number max  The highest number in the range
@@ -60,8 +87,8 @@ const findItem = (inventory, item) => {
 /**
  * Displays a menu prompt.
  * @param rl  The readline interface.
- * @param String prompt  The question to respond to.
  * @param Array options  The list of choices the user is presented with.
+ * @param String prompt  The question to respond to.
  * @returns Number  The index of the selected option.
  */
 const menuSelect = async (rl, options, prompt) => {
@@ -279,6 +306,8 @@ const saveFileExt = '.dat';
 const Cheats = ['give', 'spawn'];
 
 module.exports = {
+    initPlayer,
+    log,
     randomInt,
     randomItem,
     countItem,

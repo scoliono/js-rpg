@@ -6,13 +6,20 @@ const io = require('socket.io-client');
 const { fork } = require('child_process');
 const server = fork('./server.js');
 
+var socket;
+
+// player state
+var player = {};
+
 server.on('message', msg => {
-    console.log(msg);
     // only connect once server is ready
     if (msg.status === 'ready') {
-        const socket = io(`https://js-rpg.scoliono.repl.co`);
-        socket.on('connect', () => {
-            console.log('Connected to server');
+        socket = io('http://localhost:3000');
+        socket.on('join', player => {
+            console.log(`* ${player.name} joined the game`);
+        });
+        socket.on('chat', ({ message, username }) => {
+            console.log(`<${username}> ${message}`);
         });
     }
 });
@@ -21,19 +28,6 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-
-// player state
-var player = {
-    hunger: 100,
-    health: 100,
-    inventory: [],
-    // [ {name: "Shovel", life: 0.5}, {name: "Shovel", life: 0.75}, {name: "Rock"} ]
-    opponent: null,
-    pet: null,
-    shield: null,
-    maxInventorySlots: 10,
-    discoveredItems: {}     // { "Shovel": true, "Stick": true }
-};
 
 /**
  * Prints out the status of the player and opponent, if there is one. Should run every turn.
@@ -163,12 +157,29 @@ function doCombatTurn()
 }
 
 
+// main menu
+async function mainMenu()
+{
+    console.log('Welcome to my JavaScript RPG!');
+    const mode = await helpers.menuSelect(
+        rl,
+        ['Singleplayer', 'Multiplayer'],
+        'Select a game mode:'
+    );
+    if (mode !== -1) {
+        const username = await helpers.question(rl, 'Enter a username: ');
+        socket.emit('join', username);
+        await gameLoop();
+        console.log('Game Over!');
+    } else {
+        console.log('Bye!');
+    }
+    process.exit(0);
+}
+
 // main game loop
 async function gameLoop()
 {
-    // ask for player name
-    player.name = await helpers.question(rl, 'What\'s your name? ');
-    console.log(`Hello, ${player.name}!`);
     var gameOver = false;
     var lastCommand = 0;
     while (!gameOver) {
@@ -177,7 +188,7 @@ async function gameLoop()
         const args = answer.split(' ');
         const command = args[0].toLowerCase();
         if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
-            lastCommand = await commands[command](player, args, rl);
+            lastCommand = await commands[command](player, args, rl, socket);
         } else {
             lastCommand = helpers.Status.NO_ACTION;
             console.error('That action is invalid!');
@@ -193,7 +204,6 @@ async function gameLoop()
         }
         gameOver = await checkDeath();
     }
-
-    console.log('Game Over!');
 }
-gameLoop();
+
+mainMenu();

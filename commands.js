@@ -306,6 +306,12 @@ const load = async function (player, args, rl) {
     }
 };
 
+const chat = async function (player, args, rl, socket) {
+    const msg = helpers.multiWordArg(args);
+    socket.emit('chat', msg);
+    return helpers.Status.NO_ACTION;
+};
+
 const clearlogs = async function () {
     const readdir = util.promisify(fs.readdir);
     const unlink = util.promisify(fs.unlink);
@@ -318,6 +324,7 @@ const clearlogs = async function () {
 module.exports = {
     craft, eat, heal, walk, run, attack,
     inventory, rummage, drop, equip, unequip,
+    chat,
     clear, help, quit, save, load,
     give, spawn, clearlogs
 };
