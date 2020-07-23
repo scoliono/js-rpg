@@ -149,7 +149,12 @@ function doCombatTurn()
  */
 function connect(addr = 'http://localhost:3000')
 {
-    socket = io(addr);
+    return new Promise((resolve, reject) => {
+        socket = io(addr);
+        socket.on('connect', resolve);
+        socket.on('connect_timeout', reject);
+        socket.on('connect_error', reject);
+    });
 }
 
 /**
@@ -203,7 +208,7 @@ async function mainMenu()
         }
         if (mode === 0) {
             await bootServer();
-            connect();
+            await connect();
             join();
         } else if (mode === 1) {
             const mpMode = await helpers.menuSelect(
@@ -213,10 +218,15 @@ async function mainMenu()
                 continue;
             } else if (mpMode === 0) {
                 await bootServer();
-                connect();
+                await connect();
             } else {
                 const addr = await helpers.question(rl, 'Enter the server address: ');
-                connect(addr);
+                try {
+                    await connect(addr);
+                } catch (err) {
+                    console.error('Connection error: ' + err);
+                    continue;
+                }
             }
             const username = await helpers.question(rl, 'Enter a username: ');
             join(username);
