@@ -26,4 +26,8 @@ io.on('connect', socket => {
         helpers.log(stream, `New chat message from ${username}: ${msg}`);
         io.emit('chat', { message: msg, username });
     });
+    socket.on('command', msg => {
+        const username = players[socket.id].name;
+        helpers.log(stream, `New command from ${username}: ${msg}`);
+    });
 });
