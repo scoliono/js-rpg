@@ -1,8 +1,8 @@
-var allItems = require('../items.json');
-var allAnimals = require('../animals.json');
+var allItems = require(__dirname + '/../items.json');
+var allAnimals = require(__dirname + '/../animals.json');
 
-const config = require('../server/settings.json');
-const helpers = require('../helpers.js');
+const config = require(__dirname + '/../server/settings.json');
+const helpers = require(__dirname + '/../helpers.js');
 
 const fs = require('fs');
 const util = require('util');

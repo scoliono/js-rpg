@@ -1,7 +1,7 @@
 const readline = require('readline');
-const commands = require('./client/commands.js');
-const helpers = require('./helpers.js');
-const config = require('./server/settings.json');
+const commands = require(__dirname + '/client/commands.js');
+const helpers = require(__dirname + '/helpers.js');
+const config = require(__dirname + '/server/settings.json');
 const io = require('socket.io-client');
 const { fork } = require('child_process');
 

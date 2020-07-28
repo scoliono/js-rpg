@@ -1,5 +1,5 @@
-const allItems = require('./items.json');
-const allAnimals = require('./animals.json');
+const allItems = require(__dirname + '/items.json');
+const allAnimals = require(__dirname + '/animals.json');
 const fs = require('fs');
 const util = require('util');
 

@@ -1,8 +1,8 @@
 const fs = require('fs');
 const io = require('socket.io')();
-const helpers = require('../helpers.js');
-const config = require('./settings.json');
-const commands = require('./commands.js');
+const helpers = require(__dirname + '/../helpers.js');
+const config = require(__dirname + '/settings.json');
+const commands = require(__dirname + '/commands.js');
 
 var players = {};
 
@@ -36,7 +36,7 @@ io.on('connect', socket => {
     socket.on('command', msg => {
         const player = players[socket.id];
         const username = player.name;
-        const args = answer.split(' ');
+        const args = msg.split(' ');
         const command = args[0].toLowerCase();
         helpers.log(stream, `New command from ${username} with args ${args}`);
         if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
