@@ -1,43 +1,15 @@
-var allItems = require('./items.json');
-var allAnimals = require('./animals.json');
+var allItems = require('../items.json');
+var allAnimals = require('../animals.json');
 
-const config = require('./settings.json');
-const helpers = require('./helpers.js');
+const config = require('../server/settings.json');
+const helpers = require('../helpers.js');
 
 const fs = require('fs');
 const util = require('util');
 
-const give = async function (player, args, rl) {
-    let itemName = helpers.multiWordArg(args);
-    if (allItems[itemName]) {
-        const result = await helpers.giveItem(player, { [itemName]: 1 }, rl);
-        return result ? helpers.Status.SUCCESS : helpers.Status.NO_ACTION;
-    } else {
-        console.error(`Unrecognized item name ${itemName}`);
-        return helpers.Status.NO_ACTION;
-    }
-};
+var ClientCommands = {};
 
-const spawn = async function (player, args) {
-    let animalName = helpers.multiWordArg(args);
-    let animal = helpers.findAnimal(animalName);
-    if (animal) {
-        if (animal.friendly) {
-            player.pet = {};
-            Object.assign(player.pet, animal);
-            return helpers.Status.SUCCESS;
-        } else {
-            player.opponent = {};
-            Object.assign(player.opponent, animal);
-            return helpers.Status.SUCCESS;
-        }
-    } else {
-        console.error(`Unrecognized animal name ${animalName}`);
-        return helpers.Status.NO_ACTION;
-    }
-};
-
-const craft = async function (player, args, rl) {
+ClientCommands.craft = async function (player, args, rl) {
     let itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to craft.');
@@ -68,7 +40,7 @@ const craft = async function (player, args, rl) {
     }
 };
 
-const eat = async function (player, args) {
+ClientCommands.eat = async function (player, args) {
     if (player.hunger < 100) {
         let success = helpers.removeItems(player.inventory, {'Rations': 1});
         if (success) {
@@ -85,21 +57,21 @@ const eat = async function (player, args) {
     }
 };
 
-const walk = async function (player, args) {
+ClientCommands.walk = async function (player, args) {
     const place = helpers.multiWordArg(args) || 'middle of nowhere';
     console.log(`You walk to the ${place}.`);
     player.hunger -= helpers.randomInt(1, 5);
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };
 
-const run = async function (player, args) {
+ClientCommands.run = async function (player, args) {
     const place = helpers.multiWordArg(args) || 'middle of nowhere';
     console.log(`You run to the ${place}.`);
     player.hunger -= helpers.randomInt(3, 10);
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };
 
-const inventory = async function (player) {
+ClientCommands.inventory = async function (player) {
     console.log(`${player.inventory.length}/${player.maxInventorySlots} items full`);
     if (player.inventory.length === 0) {
         console.log('You have nothing!');
@@ -114,7 +86,7 @@ const inventory = async function (player) {
     return helpers.Status.NO_ACTION;
 };
 
-const rummage = async function (player, args, rl) {
+ClientCommands.rummage = async function (player, args, rl) {
     const randItem = helpers.randomItem();
     player.hunger -= helpers.randomInt(3, 5);
     if (randItem === 'Nothing') {
@@ -125,7 +97,7 @@ const rummage = async function (player, args, rl) {
     return helpers.Status.SUCCESS | helpers.Status.MOVED;
 };
 
-const attack = async function (player, args) {
+ClientCommands.attack = async function (player, args) {
     let target;
     switch (args[1]) {
         case 'enemy':
@@ -177,7 +149,7 @@ const attack = async function (player, args) {
     return helpers.Status.SUCCESS;
 };
 
-const heal = async function (player, args) {
+ClientCommands.heal = async function (player, args) {
     const result = helpers.removeItems(player.inventory, {
         Bandage: 1
     });
@@ -192,7 +164,7 @@ const heal = async function (player, args) {
     }
 };
 
-const drop = async function (player, args) {
+ClientCommands.drop = async function (player, args) {
     const itemName = helpers.multiWordArg(args);
     if (!itemName) {
         console.error('You did not specify an item to drop.');
@@ -210,7 +182,7 @@ const drop = async function (player, args) {
     }
 };
 
-const equip = async function (player, args) {
+ClientCommands.equip = async function (player, args) {
     const itemName = helpers.multiWordArg(args);
     if (!allItems[itemName].equippable) {
         console.error('You cannot equip that.');
@@ -237,7 +209,7 @@ const equip = async function (player, args) {
     }
 };
 
-const unequip = async function (player, args) {
+ClientCommands.unequip = async function (player, args) {
     if (player.inventory.length === player.maxInventorySlots) {
         console.error('You need to get rid of something before unequipping.');
         return helpers.Status.NO_ACTION;
@@ -249,12 +221,12 @@ const unequip = async function (player, args) {
     return helpers.Status.SUCCESS;
 };
 
-const clear = async function () {
+ClientCommands.clear = async function () {
     console.clear();
     return helpers.Status.NO_ACTION;
 };
 
-const help = async function () {
+ClientCommands.help = async function () {
     let cmds = Object.keys(module.exports);
     if (!config.dev) {
         cmds = cmds.filter(cmd => !helpers.Cheats.includes(cmd));
@@ -263,12 +235,12 @@ const help = async function () {
     return helpers.Status.NO_ACTION;
 };
 
-const quit = async function () {
+ClientCommands.quit = async function () {
     process.exit(0);
     return helpers.Status.NO_ACTION;
 };
 
-const save = async function (player, args, rl) {
+ClientCommands.save = async function (player, args, rl) {
     const filename = await helpers.filePicker(args, './saves', helpers.saveFileExt, rl);
     if (filename === null) {
         return helpers.Status.NO_ACTION;
@@ -287,7 +259,7 @@ const save = async function (player, args, rl) {
     }
 };
 
-const load = async function (player, args, rl) {
+ClientCommands.load = async function (player, args, rl) {
     const filename = await helpers.filePicker(args, './saves', helpers.saveFileExt, rl);
     if (filename === null) {
         return helpers.Status.NO_ACTION;
@@ -306,13 +278,13 @@ const load = async function (player, args, rl) {
     }
 };
 
-const chat = async function (player, args, rl, socket) {
+ClientCommands.chat = async function (player, args, rl, socket) {
     const msg = helpers.multiWordArg(args);
     socket.emit('chat', msg);
     return helpers.Status.NO_ACTION;
 };
 
-const clearlogs = async function () {
+ClientCommands.clearlogs = async function () {
     const readdir = util.promisify(fs.readdir);
     const unlink = util.promisify(fs.unlink);
     const fileList = (await readdir('./logs')).filter(f => f.endsWith('.log'));
@@ -321,10 +293,4 @@ const clearlogs = async function () {
     });
 };
 
-module.exports = {
-    craft, eat, heal, walk, run, attack,
-    inventory, rummage, drop, equip, unequip,
-    chat,
-    clear, help, quit, save, load,
-    give, spawn, clearlogs
-};
+module.exports = ClientCommands;

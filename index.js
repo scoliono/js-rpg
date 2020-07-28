@@ -1,7 +1,7 @@
 const readline = require('readline');
-const commands = require('./commands.js');
+const commands = require('./client/commands.js');
 const helpers = require('./helpers.js');
-const config = require('./settings.json');
+const config = require('./server/settings.json');
 const io = require('socket.io-client');
 const { fork } = require('child_process');
 
@@ -161,14 +161,23 @@ function connect(addr = 'http://localhost:3000')
  * Enters the game server on the current socket and registers the player.
  * @param String [username='Player']  The player's username.
  */
-function join(username = 'Player')
+async function join(username = 'Player')
 {
-    socket.emit('join', username);
-    socket.on('join', player => {
-        console.log(`* ${player.name} joined the game`);
-    });
-    socket.on('chat', ({ message, username }) => {
-        console.log(`<${username}> ${message}`);
+    return new Promise((resolve, reject) => {
+        socket.emit('join', username);
+        socket.on('join', player => {
+            // ensure the player that just joined was us
+            if (player.socketID === socket.id) {
+                resolve(player);
+                console.log(`* You joined the game`);
+            } else {
+                console.log(`* <${player.name}> joined the game`);
+            }
+        });
+        socket.on('username_taken', reject);
+        socket.on('chat', ({ message, username }) => {
+            console.log(`<${username}> ${message}`);
+        });
     });
 }
 
@@ -181,7 +190,7 @@ function bootServer()
 {
     return new Promise((resolve, reject) => {
         try {
-            const server = fork('./server.js');
+            const server = fork('./server');
             server.on('message', msg => {
                 // only connect once server is ready
                 if (msg.status === 'ready') {
@@ -209,7 +218,7 @@ async function mainMenu()
         if (mode === 0) {
             await bootServer();
             await connect();
-            join();
+            await join();
         } else if (mode === 1) {
             const mpMode = await helpers.menuSelect(
                 rl, ['Host a Game', 'Join a Game'], 'Select an option: '
@@ -229,7 +238,12 @@ async function mainMenu()
                 }
             }
             const username = await helpers.question(rl, 'Enter a username: ');
-            join(username);
+            try {
+                await join(username);
+            } catch (err) {
+                console.error(`The name ${username} is already taken.`);
+                continue;
+            }
         }
         await gameLoop();
         console.log('Game Over!');
@@ -248,7 +262,10 @@ async function gameLoop()
         const answer = await helpers.question(rl, '> ');
         const args = answer.split(' ');
         const command = args[0].toLowerCase();
-        if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
+        // validate the command before sending to server
+        const shouldEmit = !(command in commands) || commands[command](player, args);
+        if (shouldEmit) {
+            // run the command on the server if needed
             socket.emit('command', answer);
             lastCommand = await commands[command](player, args, rl, socket);
         } else {
