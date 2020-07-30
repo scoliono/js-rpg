@@ -6,6 +6,7 @@ const io = require('socket.io-client');
 const { fork } = require('child_process');
 
 var socket;
+const events = require(__dirname + '/client/events.js')(socket);
 
 // player state
 var player = {};
@@ -165,20 +166,26 @@ async function join(username = 'Player')
 {
     return new Promise((resolve, reject) => {
         socket.emit('join', username);
-        socket.on('join', player => {
-            // ensure the player that just joined was us
-            if (player.socketID === socket.id) {
-                resolve(player);
-                console.log(`* You joined the game`);
-            } else {
-                console.log(`* <${player.name}> joined the game`);
-            }
+        socket.on('join', (player) => {
+            events.onPlayerJoined(player, resolve);
         });
-        socket.on('username_taken', reject);
-        socket.on('chat', ({ message, username }) => {
-            console.log(`<${username}> ${message}`);
+        socket.on('username_taken', name => {
+            tearDown();
+            reject(name);
         });
+        socket.on('chat', events.onChatMessage);
     });
+}
+
+/**
+ * unhooks event listeners before disconnecting from a server.
+ */
+function tearDown()
+{
+    socket.off('join', (player) => {
+        events.onPlayerJoined(player, resolve);
+    });
+    socket.off('chat', events.onChatMessage);
 }
 
 /**
@@ -240,6 +247,7 @@ async function mainMenu()
             const username = await helpers.question(rl, 'Enter a username: ');
             try {
                 await join(username);
+                
             } catch (err) {
                 console.error(`The name ${username} is already taken.`);
                 continue;
