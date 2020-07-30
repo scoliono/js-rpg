@@ -3,7 +3,6 @@ var ClientEvents = function ClientEvents(socket) {
 };
 
 ClientEvents.prototype.onPlayerJoined = function (player, resolve) {
-    console.log(this.socket);
     // ensure the player that just joined was us
     if (player.socketID === this.socket.id) {
         resolve(player);

@@ -160,6 +160,8 @@ function connect(addr = 'http://localhost:3000')
     });
 }
 
+var onPlayerJoinedWithResolve;
+
 /**
  * Enters the game server on the current socket and registers the player.
  * @param String [username='Player']  The player's username.
@@ -167,10 +169,11 @@ function connect(addr = 'http://localhost:3000')
 async function join(username = 'Player')
 {
     return new Promise((resolve, reject) => {
-        socket.emit('join', username);
-        socket.on('join', (player) => {
+        onPlayerJoinedWithResolve = function (player) {
             events.onPlayerJoined(player, resolve);
-        });
+        };
+        socket.emit('join', username);
+        socket.on('join', onPlayerJoinedWithResolve);
         socket.on('username_taken', reject);
         socket.on('chat', events.onChatMessage);
     });
@@ -181,9 +184,7 @@ async function join(username = 'Player')
  */
 function tearDown()
 {
-    socket.off('join', (player) => {
-        events.onPlayerJoined(player, resolve);
-    });
+    socket.off('join', onPlayerJoinedWithResolve);
     socket.off('chat', events.onChatMessage);
     socket = null;
 }
