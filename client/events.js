@@ -2,7 +2,8 @@ var ClientEvents = function ClientEvents(socket) {
     this.socket = socket;
 };
 
-ClientEvents.onPlayerJoined = (player, resolve) => {
+ClientEvents.prototype.onPlayerJoined = function (player, resolve) {
+    console.log(this.socket);
     // ensure the player that just joined was us
     if (player.socketID === this.socket.id) {
         resolve(player);
@@ -12,7 +13,7 @@ ClientEvents.onPlayerJoined = (player, resolve) => {
     }
 };
 
-ClientEvents.onChatMessage = ({ message, username }) => {
+ClientEvents.prototype.onChatMessage = function ({ message, username }) {
     console.log(`<${username}> ${message}`);
 };
 

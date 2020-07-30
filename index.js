@@ -5,8 +5,9 @@ const config = require(__dirname + '/server/settings.json');
 const io = require('socket.io-client');
 const { fork } = require('child_process');
 
-var socket;
-const events = require(__dirname + '/client/events.js')(socket);
+var socket = null;
+const ClientEvents = require(__dirname + '/client/events.js');
+var events;
 
 // player state
 var player = {};
@@ -152,6 +153,7 @@ function connect(addr = 'http://localhost:3000')
 {
     return new Promise((resolve, reject) => {
         socket = io(addr);
+        events = new ClientEvents(socket);
         socket.on('connect', resolve);
         socket.on('connect_timeout', reject);
         socket.on('connect_error', reject);
@@ -169,10 +171,7 @@ async function join(username = 'Player')
         socket.on('join', (player) => {
             events.onPlayerJoined(player, resolve);
         });
-        socket.on('username_taken', name => {
-            tearDown();
-            reject(name);
-        });
+        socket.on('username_taken', reject);
         socket.on('chat', events.onChatMessage);
     });
 }
@@ -186,6 +185,7 @@ function tearDown()
         events.onPlayerJoined(player, resolve);
     });
     socket.off('chat', events.onChatMessage);
+    socket = null;
 }
 
 /**
@@ -250,6 +250,7 @@ async function mainMenu()
                 
             } catch (err) {
                 console.error(`The name ${username} is already taken.`);
+                tearDown();
                 continue;
             }
         }
