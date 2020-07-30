@@ -277,7 +277,7 @@ async function gameLoop()
         if (shouldEmit) {
             // run the command on the server if needed
             socket.emit('command', answer);
-            lastCommand = await commands[command](player, args, rl, socket);
+            lastCommand = await commands[command](player, args, rl);
         } else {
             lastCommand = helpers.Status.NO_ACTION;
             console.error('That action is invalid!');

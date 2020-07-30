@@ -17,7 +17,7 @@ ServerCommands.give = async function (player, args, rl) {
     }
 };
 
-ServerCommands.spawn = async function (player, args) {
+ServerCommands.spawn = async function (player, args, io) {
     let animalName = helpers.multiWordArg(args);
     let animal = helpers.findAnimal(animalName);
     if (animal) {
@@ -34,6 +34,12 @@ ServerCommands.spawn = async function (player, args) {
         console.error(`Unrecognized animal name ${animalName}`);
         return helpers.Status.NO_ACTION;
     }
+};
+
+ServerCommands.chat = async function (player, args, io) {
+    const username = player.name;
+    const msg = helpers.multiWordArg(args);
+    io.emit('chat', { message: msg, username });
 };
 
 module.exports = ServerCommands;

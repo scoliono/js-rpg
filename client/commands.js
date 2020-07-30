@@ -278,9 +278,8 @@ ClientCommands.load = async function (player, args, rl) {
     }
 };
 
-ClientCommands.chat = async function (player, args, rl, socket) {
+ClientCommands.chat = async function (player, args, rl) {
     const msg = helpers.multiWordArg(args);
-    socket.emit('chat', msg);
     return helpers.Status.NO_ACTION;
 };
 

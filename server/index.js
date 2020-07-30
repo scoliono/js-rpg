@@ -28,11 +28,6 @@ io.on('connect', socket => {
             io.emit('join', players[socket.id]);
         }
     });
-    socket.on('chat', msg => {
-        const username = players[socket.id].name;
-        helpers.log(stream, `New chat message from ${username}: ${msg}`);
-        io.emit('chat', { message: msg, username });
-    });
     socket.on('command', msg => {
         const player = players[socket.id];
         const username = player.name;
@@ -40,7 +35,7 @@ io.on('connect', socket => {
         const command = args[0].toLowerCase();
         helpers.log(stream, `New command from ${username} with args ${args}`);
         if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
-            const result = commands[command](player, args);
+            const result = commands[command](player, args, io);
             //TODO: decide socket.emit or io.emit
             io.emit('command', { result, command: msg, player: username });
         }
