@@ -247,8 +247,7 @@ async function mainMenu()
             }
             const username = await helpers.question(rl, 'Enter a username: ');
             try {
-                await join(username);
-                
+                player = await join(username);
             } catch (err) {
                 console.error(`The name ${username} is already taken.`);
                 tearDown();
