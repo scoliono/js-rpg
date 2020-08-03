@@ -279,8 +279,13 @@ ClientCommands.load = async function (player, args, rl) {
 };
 
 ClientCommands.chat = async function (player, args, rl) {
-    const msg = helpers.multiWordArg(args);
-    return helpers.Status.NO_ACTION;
+    const msg = helpers.multiWordArg(args).trim();
+    if (!msg) {
+        console.error('Your message cannot be blank.');
+        return false;
+    } else {
+        return true;
+    }
 };
 
 ClientCommands.clearlogs = async function () {
@@ -290,6 +295,8 @@ ClientCommands.clearlogs = async function () {
     fileList.forEach(async (f) => {
         await unlink(`./logs/${f}`);
     });
+    console.log('Deleted logs successfully.');
+    return false;
 };
 
 module.exports = ClientCommands;

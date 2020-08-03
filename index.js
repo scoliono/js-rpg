@@ -179,6 +179,14 @@ async function join(username = 'Player')
     });
 }
 
+async function getCommandResponse(command)
+{
+    return new Promise((resolve, reject) => {
+        socket.on('invalid_command', reject);
+        socket.on('command_response', resolve);
+    });
+}
+
 /**
  * unhooks event listeners before disconnecting from a server.
  */
@@ -272,14 +280,22 @@ async function gameLoop()
         const args = answer.split(' ');
         const command = args[0].toLowerCase();
         // validate the command before sending to server
-        const shouldEmit = !(command in commands) || commands[command](player, args);
+        const shouldEmit = !(command in commands) || await commands[command](player, args);
         if (shouldEmit) {
             // run the command on the server if needed
             socket.emit('command', answer);
-            lastCommand = await commands[command](player, args, rl);
+            try {
+                const res = await getCommandResponse(answer);
+                lastCommand = res.status;
+                //TODO: consider making this its own function, "parseCommandResponse"
+                if (res.players) {
+                    console.log(`Players: ${players.join(', ')}`);
+                }
+            } catch (err) {
+                console.error('Command failed: ' + err.message);
+            }
         } else {
             lastCommand = helpers.Status.NO_ACTION;
-            console.error('That action is invalid!');
         }
         // if last command did not fail, regardless of combat status
         if (lastCommand & helpers.Status.SUCCESS) {

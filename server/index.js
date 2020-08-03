@@ -34,10 +34,13 @@ io.on('connect', socket => {
         const args = msg.split(' ');
         const command = args[0].toLowerCase();
         helpers.log(stream, `New command from ${username} with args ${args}`);
-        if (command in commands && (!helpers.Cheats.includes(command) || config.dev)) {
-            const result = commands[command](player, args, io);
-            //TODO: decide socket.emit or io.emit
-            io.emit('command', { result, command: msg, player: username });
+        const commandExists = command in commands;
+        const commandAllowed = !helpers.Cheats.includes(command) || config.dev;
+        if (commandExists && commandAllowed) {
+            const response = commands[command](player, args, players, socket, io);
+            socket.emit('command_response', response);
+        } else {
+            socket.emit('invalid_command', { message: 'Unknown command.' });
         }
     });
 });
