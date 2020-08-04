@@ -3,6 +3,7 @@ const io = require('socket.io')();
 const helpers = require(__dirname + '/../helpers.js');
 const config = require(__dirname + '/settings.json');
 const commands = require(__dirname + '/commands.js');
+const turn = require(__dirname + '/turn.js');
 
 var players = {};
 
@@ -30,6 +31,9 @@ io.on('connect', socket => {
     });
     socket.on('command', msg => {
         const player = players[socket.id];
+        turn.doCombatTurn(player);
+        turn.doPetTurn(player);
+
         const username = player.name;
         const args = msg.split(' ');
         const command = args[0].toLowerCase();
@@ -42,5 +46,18 @@ io.on('connect', socket => {
         } else {
             socket.emit('invalid_command', { message: 'Unknown command.' });
         }
+        let deathReason = /*turn.checkDeath(player)*/ helpers.DeathReason.KILLED;
+        if (deathReason !== false) {
+            helpers.log(stream, `${username} died, reason: ${deathReason}`);
+            io.emit('death', {
+                username,
+                socketID: socket.id,
+                reason: deathReason
+            });
+        }
+    });
+    socket.on('disconnect', reason => {
+        io.emit('disconnect', reason);
+        players[socket.id] = undefined;
     });
 });

@@ -301,6 +301,14 @@ const Status = {
     MOVED: 2
 };
 
+/**
+ * A list of all ways someone can die.
+ */
+const DeathReason = {
+    KILLED: 0,
+    STARVATION: 1,
+};
+
 const saveFileExt = '.dat';
 
 const Cheats = ['give', 'spawn'];
@@ -325,5 +333,6 @@ module.exports = {
     randomPet,
     randomChoice,
     Status,
+    DeathReason,
     Cheats
 };
