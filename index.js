@@ -289,7 +289,7 @@ async function gameLoop()
                 lastCommand = res.status;
                 //TODO: consider making this its own function, "parseCommandResponse"
                 if (res.players) {
-                    console.log(`Players: ${players.join(', ')}`);
+                    console.log(`Players: ${res.players.join(', ')}`);
                 }
             } catch (err) {
                 console.error('Command failed: ' + err.message);

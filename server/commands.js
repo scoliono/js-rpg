@@ -6,10 +6,10 @@ const helpers = require(__dirname + '/../helpers.js');
 
 var ServerCommands = {};
 
-ServerCommands.give = async function (player, args, players, socket, io) {
+ServerCommands.give = function (player, args, players, socket, io) {
     let itemName = helpers.multiWordArg(args);
     if (allItems[itemName]) {
-        const result = await helpers.giveItem(player, { [itemName]: 1 }, null);
+        const result = helpers.giveItem(player, { [itemName]: 1 }, null);
         return result ? helpers.Status.SUCCESS : helpers.Status.NO_ACTION;
     } else {
         console.error(`Unrecognized item name ${itemName}`);
@@ -17,7 +17,7 @@ ServerCommands.give = async function (player, args, players, socket, io) {
     }
 };
 
-ServerCommands.spawn = async function (player, args, players, socket, io) {
+ServerCommands.spawn = function (player, args, players, socket, io) {
     let animalName = helpers.multiWordArg(args);
     let animal = helpers.findAnimal(animalName);
     if (animal) {
@@ -36,7 +36,7 @@ ServerCommands.spawn = async function (player, args, players, socket, io) {
     }
 };
 
-ServerCommands.chat = async function (player, args, players, socket, io) {
+ServerCommands.chat = function (player, args, players, socket, io) {
     const username = player.name;
     const msg = helpers.multiWordArg(args).trim();
     if (msg) {
@@ -47,7 +47,7 @@ ServerCommands.chat = async function (player, args, players, socket, io) {
     return { status: helpers.Status.NO_ACTION };
 };
 
-ServerCommands.players = async function (player, args, players, socket, io) {
+ServerCommands.players = function (player, args, players, socket, io) {
     return {
         players: Object.values(players).map(p => p.name),
         status: helpers.Status.NO_ACTION
