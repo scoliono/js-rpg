@@ -54,4 +54,23 @@ ServerCommands.players = function (player, args, players, socket, io) {
     };
 };
 
+ServerCommands.kick = function (player, args, players, socket, io, sockets) {
+    // admin only
+    if (socket.handshake.address !== '::ffff:127.0.0.1') {
+        socket.emit('invalid_command', { message: 'You are not admin.' });
+    } else {
+        const targetName = helpers.multiWordArg(args);
+        const target = Object.values(players).filter(p => p.name === targetName)[0];
+        if (!target) {
+            socket.emit('invalid_command', {
+                message: `Player ${targetName} not found.`
+            });
+        } else {
+            sockets[target.socketID].disconnect(true);
+            console.log(`Kicked ${targetName} successfully.`);
+        }
+    }
+    return { status: helpers.Status.NO_ACTION };
+};
+
 module.exports = ServerCommands;

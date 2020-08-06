@@ -6,6 +6,7 @@ const commands = require(__dirname + '/commands.js');
 const turn = require(__dirname + '/turn.js');
 
 var players = {};
+var sockets = {};
 
 // create a log file
 const filename = new Date().toJSON().replace('T', '_').replace(/[:\.]/g, '-').slice(0, -1);
@@ -16,6 +17,7 @@ helpers.log(stream, `Started the server on port ${config.port}`);
 process.send({ status: 'ready' });
 
 io.on('connect', socket => {
+    sockets[socket.id] = socket;
     helpers.log(stream, `New connection from ${socket.handshake.address}`);
     socket.on('join', name => {
         players[socket.id] = helpers.initPlayer();
@@ -41,7 +43,7 @@ io.on('connect', socket => {
         const commandExists = command in commands;
         const commandAllowed = !helpers.Cheats.includes(command) || config.dev;
         if (commandExists && commandAllowed) {
-            const response = commands[command](player, args, players, socket, io);
+            const response = commands[command](player, args, players, socket, io, sockets);
             socket.emit('command_response', response);
         } else {
             socket.emit('invalid_command', { message: 'Unknown command.' });
@@ -57,6 +59,7 @@ io.on('connect', socket => {
         }
     });
     socket.on('disconnect', reason => {
+        helpers.log(stream, `${socket.id} was disconnected, reason: ${reason}`);
         const username = players[socket.id].name;
         io.emit('player_disconnect', {
             username,
