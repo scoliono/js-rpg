@@ -76,6 +76,8 @@ async function join(username = 'Player')
         socket.on('join', onPlayerJoinedWithResolve);
         socket.on('username_taken', reject);
         socket.on('chat', events.onChatMessage);
+        socket.on('disconnect', events.onSelfDisconnect);
+        socket.on('player_disconnect', events.onDisconnect);
         socket.on('death', events.onDeath.bind(events));
     });
 }
@@ -95,6 +97,7 @@ function tearDown()
 {
     socket.off('join', onPlayerJoinedWithResolve);
     socket.off('chat', events.onChatMessage);
+    socket.off('disconnect', events.onDisconnect);
     socket.off('death', events.onDeath.bind(events));
     socket = null;
 }

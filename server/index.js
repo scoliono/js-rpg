@@ -46,7 +46,7 @@ io.on('connect', socket => {
         } else {
             socket.emit('invalid_command', { message: 'Unknown command.' });
         }
-        let deathReason = /*turn.checkDeath(player)*/ helpers.DeathReason.KILLED;
+        let deathReason = turn.checkDeath(player);
         if (deathReason !== false) {
             helpers.log(stream, `${username} died, reason: ${deathReason}`);
             io.emit('death', {
@@ -57,7 +57,12 @@ io.on('connect', socket => {
         }
     });
     socket.on('disconnect', reason => {
-        io.emit('disconnect', reason);
+        const username = players[socket.id].name;
+        io.emit('player_disconnect', {
+            username,
+            socketID: socket.id,
+            reason
+        });
         players[socket.id] = undefined;
     });
 });

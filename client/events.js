@@ -37,4 +37,12 @@ ClientEvents.prototype.onDeath = function ({ username, socketID, reason }) {
     console.log(str);
 };
 
+ClientEvents.prototype.onDisconnect = function ({ username, socketID, reason }) {
+    console.log(`* ${username} left the game: ${reason}`);
+};
+
+ClientEvents.prototype.onSelfDisconnect = function (reason) {
+    console.log(`* You were disconnected: ${reason}`);
+};
+
 module.exports = ClientEvents;
