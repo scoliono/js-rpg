@@ -59,8 +59,8 @@ io.on('connect', socket => {
         }
     });
     socket.on('disconnect', reason => {
-        helpers.log(stream, `${socket.id} was disconnected, reason: ${reason}`);
         const username = players[socket.id].name;
+        helpers.log(stream, `${username} was disconnected, reason: ${reason}`);
         io.emit('player_disconnect', {
             username,
             socketID: socket.id,

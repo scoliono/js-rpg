@@ -176,7 +176,7 @@ async function mainMenu()
 async function gameLoop()
 {
     var lastCommand = 0;
-    while (!gameOver) {
+    while (!gameOver && !socket.disconnected) {
         printStatus();
         const answer = await helpers.question(rl, '> ');
         const args = answer.split(' ');
