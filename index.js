@@ -76,7 +76,7 @@ async function join(username = 'Player')
         socket.on('join', onPlayerJoinedWithResolve);
         socket.on('username_taken', reject);
         socket.on('chat', events.onChatMessage);
-        socket.on('death', events.onDeath);
+        socket.on('death', events.onDeath.bind(events));
     });
 }
 
@@ -95,7 +95,7 @@ function tearDown()
 {
     socket.off('join', onPlayerJoinedWithResolve);
     socket.off('chat', events.onChatMessage);
-    socket.off('death', events.onDeath);
+    socket.off('death', events.onDeath.bind(events));
     socket = null;
 }
 
@@ -166,9 +166,7 @@ async function mainMenu()
         }
         await gameLoop();
         console.log('Game Over!');
-        break;
     }
-    process.exit(0);
 }
 
 // main game loop
@@ -181,7 +179,7 @@ async function gameLoop()
         const args = answer.split(' ');
         const command = args[0].toLowerCase();
         // validate the command before sending to server
-        const shouldEmit = !(command in commands) || await commands[command](player, args, rl);
+        const shouldEmit = !(command in commands) || await commands[command](player, args, rl, socket);
         if (shouldEmit) {
             // run the command on the server if needed
             socket.emit('command', answer);

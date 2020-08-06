@@ -21,7 +21,7 @@ ClientEvents.prototype.onChatMessage = function ({ message, username }) {
 ClientEvents.prototype.onDeath = function ({ username, socketID, reason }) {
     var str = '* ';
     if (socketID === this.socket.id) {
-        str += 'You'
+        str += 'You';
     } else {
         str += username;
     }

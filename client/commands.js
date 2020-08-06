@@ -235,7 +235,10 @@ ClientCommands.help = async function () {
     return helpers.Status.NO_ACTION;
 };
 
-ClientCommands.quit = async function () {
+ClientCommands.quit = async function (player, args, rl, socket) {
+    if (socket) {
+        socket.disconnect(true);
+    }
     process.exit(0);
     return helpers.Status.NO_ACTION;
 };
